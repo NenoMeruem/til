@@ -6,19 +6,19 @@ Mục tiêu của dự án là:
 - Lưu trữ kiến thức ngắn gọn, dễ tra cứu.
 - Xây dựng một "kho ghi chú sống" hỗ trợ việc học tập và phát triển kỹ năng lâu dài.
 
-## 📂 Chủ đề bao gồm:
+## Chủ đề bao gồm:
 
-### 📚 Courses
+### Courses
 Tóm tắt nội dung và ghi chú quan trọng từ các khóa học online/offline.
 
-### 🔥 100-Days-Challenges
+### 100-Days-Challenges
 Ghi chú quá trình tham gia các thử thách học tập trong 100 ngày (ví dụ: 100 Days of Go, Neovim, v.v.).
 
-### 🔍 Algorithms
+### Algorithms
 Hướng tiếp cận, phân tích và ghi chú lời giải cho các bài toán thuật toán.
 
-### 🗞️ Interesting-Facts
+### Interesting-Facts
 Những điều học được từ việc đọc tin tức công nghệ, blog hoặc tài liệu chuyên sâu.
 
-### 🛠️ Tips-and-Setup
+### Tips-and-Setup
 Cách cấu hình công cụ, mẹo dùng nhanh, xử lý lỗi phổ biến,...

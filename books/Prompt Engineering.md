@@ -76,3 +76,224 @@ Cách tốt nhất để lựa chọn giữa **top-K** và **top-P** là **
 ### Putting it all together 
 
 
+Việc lựa chọn giữa **top-K**, **top-P**, **temperature** và **số lượng token cần sinh (max tokens)** phụ thuộc vào **bài toán cụ thể** và **kết quả mong muốn**. Các tham số này **không hoạt động độc lập** mà **ảnh hưởng lẫn nhau**, vì vậy cần hiểu rõ cách chúng tương tác. Ngoài ra, bạn cũng cần nắm được **cách mô hình kết hợp các tham số sampling** này với nhau.  
+
+Nếu **temperature**, **top-K** và **top-P** đều khả dụng (ví dụ như trong **Vertex AI Studio**), thì quá trình dự đoán token tiếp theo diễn ra như sau:
+
+1. Mô hình trước hết lọc các token thỏa mãn **đồng thời cả hai điều kiện top-K và top-P**.
+2. Những token vượt qua bước lọc này sẽ trở thành **ứng viên (candidate tokens)** cho token tiếp theo.
+3. Sau đó, **temperature** được áp dụng để **lấy mẫu (sampling)** từ tập token ứng viên này, nhằm điều chỉnh mức độ ngẫu nhiên của kết quả.
+
+Trong trường hợp **chỉ có top-K hoặc chỉ có top-P**, thì cơ chế hoạt động vẫn tương tự, nhưng **chỉ sử dụng một tham số tương ứng** để lọc token trước khi sampling.
+
+Nếu **temperature** không được cung cấp, hệ thống sẽ **lấy mẫu ngẫu nhiên (random sampling)** từ các **token** thỏa mãn tiêu chí **top-K** và/hoặc **top-P** để sinh ra **token dự đoán tiếp theo**.
+
+Ở các **giá trị cực hạn (extreme values)** của một tham số trong cấu hình lấy mẫu (**sampling configuration**), tham số đó có thể **vô hiệu hóa (cancel out)** các tham số cấu hình khác, hoặc trở nên **không còn ảnh hưởng (irrelevant)** đến quá trình sinh token.
+```
+- Token: đơn vị nhỏ nhất của văn bản mà mô hình xử lý (có thể là từ, một phần của từ, hoặc ký hiệu).
+- Top-K sampling: chỉ chọn trong _K token có xác suất cao nhất_.
+- Top-P (nucleus sampling): chỉ chọn trong tập token sao cho _tổng xác suất cộng dồn ≥ P_.
+- Temperature: điều chỉnh mức độ ngẫu nhiên; càng cao → kết quả càng đa dạng, càng thấp → càng “an toàn” và dễ đoán.    
+```
+
+- **Khi bạn đặt `temperature = 0`**. Lúc này, **top-K** và **top-P gần như không còn tác dụng**. Mô hình sẽ **luôn chọn token có xác suất cao nhất** làm token tiếp theo (greedy decoding), không có yếu tố ngẫu nhiên. Ngược lại, **khi `temperature` được đặt rất cao** (lớn hơn 1, thường lên đến hàng chục): `temperature` lúc này **mất tác dụng kiểm soát**. Các token vượt qua bộ lọc **top-K và/hoặc top-P** sẽ được **lấy mẫu ngẫu nhiên (random sampling)** để chọn token tiếp theo
+- **Khi bạn đặt `top-K = 1`** `temperature` và `top-P` trở nên **không còn ý nghĩa**. Chỉ **một token duy nhất** (token có xác suất cao nhất) vượt qua bộ lọc top-K. Token đó sẽ **luôn được chọn** làm token tiếp theo. Ngược lại, **khi `top-K` được đặt rất lớn** (ví dụ bằng kích thước vocabulary của LLM): Bất kỳ token nào có **xác suất khác 0** đều thỏa điều kiện top-K. **Không có token nào bị loại bỏ** bởi top-K.
+- **Khi bạn đặt `top-P = 0`** (hoặc một giá trị rất nhỏ): Hầu hết các cơ chế sampling sẽ **chỉ giữ lại token có xác suất cao nhất**. Điều này khiến `temperature` và `top-K` trở nên **không còn tác dụng**. Ngược lại, **khi `top-P = 1`**: Mọi token có **xác suất khác 0** đều thỏa điều kiện top-P. **Không có token nào bị loại bỏ** trong bước lọc top-P.
+
+Như một **thiết lập khởi điểm (baseline)**, bạn có thể dùng **temperature = 0.2**, **top-P = 0.95** và **top-K = 30**. Bộ tham số này thường cho ra kết quả **khá mạch lạc (coherent)**, vẫn có **tính sáng tạo**, nhưng **không quá ngẫu nhiên hay khó kiểm soát**.
+
+Nếu bạn muốn mô hình tạo ra kết quả **đặc biệt sáng tạo**, hãy thử bắt đầu với **temperature = 0.9**, **top-P = 0.99** và **top-K = 40**. Cấu hình này cho phép mô hình **khám phá nhiều khả năng hơn trong không gian xác suất**, dẫn đến đầu ra đa dạng hơn.
+
+Ngược lại, nếu bạn cần kết quả **ít sáng tạo hơn**, mang tính **ổn định và dự đoán được**, hãy thử **temperature = 0.1**, **top-P = 0.9** và **top-K = 20**.
+
+Cuối cùng, nếu tác vụ của bạn **luôn chỉ có một đáp án đúng duy nhất** (ví dụ: **giải bài toán toán học** hoặc các bài toán logic xác định), hãy đặt **temperature = 0** để mô hình **loại bỏ yếu tố ngẫu nhiên** và luôn chọn phương án có xác suất cao nhất.
+
+**Lưu ý:** Khi tăng mức độ tự do của mô hình (ví dụ: **temperature** cao hơn, **top-K**, **top-P** lớn hơn và **số lượng output tokens** nhiều hơn), **LLM (Large Language Model)** có xu hướng sinh ra nội dung **kém liên quan hơn** so với yêu cầu ban đầu.
+
+Dưới đây là bản dịch sang **tiếng Việt**, có dùng **thuật ngữ chuyên ngành lập trình/AI** nhưng vẫn cố gắng diễn đạt **dễ hiểu và dễ tiếp cận**:
+
+**Cảnh báo:**  Bạn đã bao giờ thấy một câu trả lời kết thúc bằng **rất nhiều từ ngữ thừa lặp đi lặp lại** chưa? Hiện tượng này còn được gọi là **“repetition loop bug”** (lỗi vòng lặp lặp lại). Đây là một vấn đề khá phổ biến trong **Large Language Models (LLMs)**, khi mô hình bị **kẹt trong một chu kỳ**, liên tục sinh ra cùng một từ, cụm từ hoặc cấu trúc câu (thường là các từ “filler” – từ đệm không mang nhiều ý nghĩa).
+
+Lỗi này thường bị **khuếch đại** khi cấu hình các tham số sinh văn bản như **temperature** và **top-k / top-p** không phù hợp.
+Hiện tượng này có thể xảy ra ở **cả temperature thấp lẫn temperature cao**, nhưng vì **những nguyên nhân khác nhau**:
+- **Ở temperature thấp**:  
+    Mô hình trở nên **quá quyết định (overly deterministic)**, luôn chọn những token có **xác suất cao nhất**. Nếu luồng sinh văn bản này quay lại một trạng thái đã xuất hiện trước đó, mô hình có thể rơi vào **vòng lặp vô hạn**, lặp lại cùng một nội dung.
+- **Ở temperature cao**:  
+    Đầu ra của mô hình trở nên **quá ngẫu nhiên**. Với không gian lựa chọn rất lớn, khả năng một từ hoặc cụm từ được chọn **tình cờ dẫn ngược lại trạng thái trước đó** sẽ tăng lên, từ đó cũng tạo ra vòng lặp.
+
+Trong cả hai trường hợp, **quy trình sampling** của mô hình bị “kẹt”, dẫn đến đầu ra **đơn điệu, kém hữu ích**, và tiếp tục lặp cho đến khi **hết cửa sổ output (context/output window)**.
+
+**Cách khắc phục**:  
+Thông thường cần **tinh chỉnh cẩn thận** các tham số **temperature** và **top-k / top-p** để tìm được **điểm cân bằng tối ưu** giữa:
+- **Tính quyết định (determinism)** – giúp câu trả lời nhất quán
+- **Tính ngẫu nhiên (randomness)** – giúp nội dung đa dạng và tự nhiên
+
+Sự cân bằng này giúp mô hình tránh bị lặp, đồng thời vẫn tạo ra nội dung chất lượng và hữu ích.
+
+## Prompting techniques
+
+Các **LLM (Large Language Models – mô hình ngôn ngữ lớn)** được **tinh chỉnh (fine-tuned)** để **tuân theo chỉ dẫn (follow instructions)** và được **huấn luyện (trained)** trên **khối lượng dữ liệu rất lớn**, nhờ đó chúng có khả năng **hiểu prompt (câu lệnh đầu vào)** và **sinh ra câu trả lời (generate output)**.
+
+Tuy nhiên, **LLM không hoàn hảo**. **Prompt càng rõ ràng, cụ thể**, thì **khả năng dự đoán chuỗi văn bản tiếp theo (next-token prediction)** của LLM càng chính xác. Nói cách khác, **chất lượng đầu ra phụ thuộc rất nhiều vào chất lượng đầu vào**.
+
+Ngoài ra, việc áp dụng **các kỹ thuật chuyên biệt** — tận dụng **cách LLM được huấn luyện** và **cách chúng vận hành nội bộ** — sẽ giúp bạn **khai thác mô hình hiệu quả hơn** và **thu được kết quả đúng trọng tâm (relevant results)**.
+
+Bây giờ, khi chúng ta đã hiểu **prompt engineering là gì** và **những yếu tố cần có để viết prompt tốt**, hãy cùng đi sâu vào **các ví dụ minh họa cho những kỹ thuật prompting quan trọng nhất**.
+
+
+### General prompting / zero shot
+
+**Zero-shot prompt** là loại prompt (lời nhắc) đơn giản nhất. Nó **chỉ cung cấp mô tả của tác vụ** và **một đoạn văn bản đầu vào** để mô hình ngôn ngữ lớn (LLM) bắt đầu xử lý. Đầu vào này có thể là bất cứ thứ gì: **một câu hỏi**, **phần mở đầu của một câu chuyện**, hoặc **các chỉ dẫn/instructions**.  
+Tên gọi **zero-shot** có nghĩa là **không có ví dụ mẫu (no examples)** được cung cấp cho mô hình trước khi thực hiện tác vụ.
+
+Hiểu ngắn gọn: zero-shot = mô tả yêu cầu → đưa input → LLM tự suy luận và trả lời, **không cần dữ liệu huấn luyện bổ sung hay ví dụ minh họa trong prompt**.
+
+Hãy sử dụng **Vertex AI Studio (cho Language)** trong **Vertex AI**, một công cụ cung cấp **playground** để thử nghiệm và tinh chỉnh **prompt**. Trong **Bảng 1**, bạn sẽ thấy một ví dụ về **zero-shot prompt** dùng để **phân loại (classify) đánh giá phim**.
+
+
+<table>
+  <tr>
+	<th>Name</th>  
+    <td colspan="3">1_1_movie_classification </td>
+  </tr>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Classify movie reviews as positive, neutral or negative.</td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >0.1</td>
+    <th >Token Limit</th>
+    <td >5</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>N/A</td>
+      <th>Top P</th>
+     <td>1</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Classify movie reviews as POSITIVE, NEUTRAL or NEGATIVE.  Review: "Her" is a disturbing study revealing the direction  humanity is headed if AI is allowed to keep evolving,  unchecked. I wish there were more movies like this masterpiece.  Sentiment: </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">POSITIVE</td>
+  </tr>
+</table>
+
+
+Định dạng bảng như bên dưới là một cách rất hiệu quả để **tài liệu hóa (document)** các prompt. Trên thực tế, prompt của bạn thường sẽ phải trải qua **nhiều vòng lặp (iterations)** trước khi được đưa vào **codebase**, vì vậy việc **theo dõi quá trình prompt engineering** một cách **có kỷ luật và có cấu trúc** là vô cùng quan trọng.
+
+Chi tiết hơn về **định dạng bảng này**, tầm quan trọng của việc theo dõi prompt engineering, cũng như **quy trình phát triển prompt**, sẽ được trình bày trong phần **Best Practices** ở cuối chương này (mục _“Document the various prompt attempts”_).
+
+Thông số **model temperature** nên được đặt ở **mức thấp**, vì bài toán này **không yêu cầu tính sáng tạo**. Đồng thời, chúng ta sử dụng các giá trị mặc định **top-K** và **top-P** của **gemini-pro**, vốn **gần như vô hiệu hóa** cả hai tham số này (xem phần _“LLM Output Configuration”_ ở trên).
+
+Hãy chú ý kỹ đến **output do mô hình sinh ra**. Các từ _“disturbing”_ và _“masterpiece”_ xuất hiện trong cùng một câu sẽ khiến việc **dự đoán (prediction)** trở nên **phức tạp hơn**, vì cả hai từ đều mang sắc thái cảm xúc trái ngược nhau.
+
+Khi **zero-shot prompting** (nhắc lệnh không kèm ví dụ) **không mang lại kết quả như mong muốn**, bạn có thể **cung cấp các bản minh họa (demonstrations) hoặc ví dụ trực tiếp trong prompt**. Cách làm này dẫn đến hai kỹ thuật nâng cao hơn:
+- **One-shot prompting**: cung cấp **1 ví dụ mẫu**
+- **Few-shot prompting**: cung cấp **một vài ví dụ mẫu**
+Trong đó:
+- **General prompting / Zero-shot**: Mô hình AI được yêu cầu thực hiện một tác vụ **mà không có bất kỳ ví dụ nào**, chỉ dựa vào kiến thức đã được huấn luyện sẵn.
+Nói cách khác:
+- Zero-shot giống như gọi một hàm mà **không truyền dữ liệu mẫu**
+- One-shot và Few-shot giống như **truyền thêm test case** để mô hình hiểu rõ yêu cầu và xử lý chính xác hơn
+
+### One-shot & few-shot
+
+Khi thiết kế **prompt** (câu lệnh đầu vào) cho các **mô hình AI**, việc cung cấp **ví dụ minh họa** là rất quan trọng. Các ví dụ này giúp mô hình hiểu rõ hơn **yêu cầu** của bạn và **kỳ vọng đầu ra** là gì. Đặc biệt, ví dụ sẽ rất hữu ích khi bạn muốn **định hướng mô hình** tạo ra kết quả theo một **cấu trúc (output structure)** hoặc **mẫu (pattern)** nhất định.
+
+**One-shot prompting** là kỹ thuật cung cấp **một ví dụ duy nhất** cho mô hình — đúng như tên gọi của nó. Ý tưởng ở đây là mô hình sẽ **học theo (imitate)** ví dụ đó để hoàn thành tác vụ một cách chính xác nhất.
+
+**Few-shot prompting** thì mở rộng hơn, bằng cách cung cấp **nhiều ví dụ** cho mô hình. Cách tiếp cận này giúp mô hình nhận diện rõ **pattern cần tuân theo**. Về bản chất, few-shot tương tự one-shot, nhưng việc có **nhiều ví dụ hơn** sẽ **tăng xác suất** mô hình hiểu đúng yêu cầu và tạo ra đầu ra đúng theo mẫu mong muốn.
+
+Số lượng ví dụ cần dùng cho **few-shot prompting** phụ thuộc vào một số yếu tố, bao gồm **độ phức tạp của tác vụ**, **chất lượng của các ví dụ**, và **năng lực của mô hình AI sinh (Generative AI – GenAI)** mà bạn đang sử dụng. Theo **nguyên tắc kinh nghiệm (rule of thumb)**, bạn nên sử dụng **ít nhất từ 3 đến 5 ví dụ** khi áp dụng few-shot prompting. Tuy nhiên, với những tác vụ **phức tạp hơn**, bạn có thể cần **nhiều ví dụ hơn** để mô hình hiểu đúng ngữ cảnh và yêu cầu. Ngược lại, trong một số trường hợp, bạn có thể phải **giảm số lượng ví dụ** do **giới hạn độ dài đầu vào (input length / token limit)** của mô hình.
+
+**Bảng 2** minh họa một ví dụ về few-shot prompt. Trong ví dụ này, chúng ta sẽ sử dụng **cùng cấu hình mô hình Gemini-Pro** như trước, **ngoại trừ việc tăng giới hạn token** để đáp ứng nhu cầu tạo ra **phản hồi dài hơn**.
+
+
+<table>
+  <tr>
+	<th>Name</th>  
+    <td colspan="3">Parse pizza orders to JSON </td>
+  </tr>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Classify movie reviews as positive, neutral or negative.</td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >0.1</td>
+    <th >Token Limit</th>
+    <td >250</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>N/A</td>
+      <th>Top P</th>
+     <td>1</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">
+      Parse a customer's pizza order into valid JSON:  
+      
+      EXAMPLE:  I want a small pizza with cheese, tomato sauce, and pepperoni.  JSON Response:  
+      
+      ```  
+      {  
+	      "size": "small",  
+	      "type": "normal",  
+	      "ingredients": [["cheese", "tomato sauce", "peperoni"]]  
+      } 
+      ```
+	   
+	   EXAMPLE:
+	   Can I get a large pizza with tomato sauce, basil and mozzarella  
+	   ```
+	   {  
+		   "size": "large",  
+		   "type": "normal",  
+		   "ingredients": [["tomato sauce", "bazel", "mozzarella"]]  
+	   }  
+	   ```
+	   Now, I would like a large pizza, with the first half cheese and  mozzarella. And the other tomato sauce, ham and pineapple.  JSON Response: ...	   
+	   </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">
+    ```
+    {  
+	    "size": "large",  
+	    "type": "half-half",  
+	    "ingredients": [["cheese", "mozzarella"], ["tomato sauce",  "ham", "pineapple"]]  
+    }  
+    ``` 
+	</td>
+</tr>
+</table>
+
+
+
+Khi lựa chọn **ví dụ (examples)** cho **prompt**, hãy sử dụng những ví dụ **liên quan trực tiếp đến tác vụ (task)** mà bạn muốn mô hình thực hiện.  
+Các ví dụ này cần **đa dạng**, **chất lượng cao** và được **viết rõ ràng, chính xác**.
+Chỉ **một lỗi nhỏ** trong ví dụ cũng có thể khiến mô hình **hiểu sai ngữ cảnh**, từ đó tạo ra **output không mong muốn**.
+
+Nếu mục tiêu của bạn là tạo ra kết quả **ổn định (robust)** trước nhiều loại **đầu vào (inputs)** khác nhau, thì việc **bao gồm các edge case** trong ví dụ là rất quan trọng.
+**Edge case** là những đầu vào **bất thường hoặc ít gặp**, nhưng mô hình **vẫn phải xử lý đúng**. Việc đưa edge case vào prompt giúp mô hình:
+- Tổng quát hóa tốt hơn
+- Giảm lỗi trong các tình huống thực tế
+- Hoạt động đáng tin cậy hơn khi gặp dữ liệu không chuẩn
+
+
+### System, contextual and role prompting 
