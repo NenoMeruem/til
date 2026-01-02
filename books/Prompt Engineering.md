@@ -297,3 +297,19 @@ Nếu mục tiêu của bạn là tạo ra kết quả **ổn định (robust)*
 
 
 ### System, contextual and role prompting 
+
+**System prompting, contextual prompting và role prompting** đều là các kỹ thuật được sử dụng để định hướng cách mà các mô hình ngôn ngữ lớn (LLM) sinh văn bản, nhưng mỗi kỹ thuật tập trung vào các khía cạnh khác nhau:
+
+- **System prompting**: Thiết lập bối cảnh tổng thể và mục đích hoạt động cho mô hình ngôn ngữ. Nó định nghĩa “bức tranh lớn” về nhiệm vụ mà mô hình cần thực hiện, ví dụ như dịch ngôn ngữ, phân loại đánh giá (review), v.v. Trong lập trình, đây giống như việc cấu hình môi trường (environment setup) hoặc khởi tạo một pipeline xử lý dữ liệu.
+- **Contextual prompting**: Cung cấp các chi tiết cụ thể hoặc thông tin nền liên quan đến cuộc trò chuyện hay nhiệm vụ hiện tại. Nó giúp mô hình nắm bắt các sắc thái (nuance) của yêu cầu và tạo ra phản hồi phù hợp hơn. Trong lập trình, bạn có thể hình dung đây như việc truyền tham số (parameters) hoặc dữ liệu đầu vào (input data) để một hàm hay module hoạt động chính xác.
+- **Role prompting**: Gán một nhân vật hoặc vai trò cụ thể cho mô hình ngôn ngữ. Kỹ thuật này giúp mô hình tạo ra phản hồi nhất quán với vai trò được giao, bao gồm kiến thức và hành vi liên quan. Trong lập trình, nó tương tự việc triển khai một class hoặc object với các phương thức và thuộc tính xác định sẵn để thực hiện một chức năng cụ thể.
+
+Có thể có sự chồng chéo đáng kể giữa **system prompt**, **contextual prompt**, và **role prompt**. Ví dụ: một prompt gán **role** cho hệ thống cũng có thể kèm theo một **context**. Tuy nhiên, mỗi loại prompt lại có **mục đích chính hơi khác nhau**:
+- **System prompt**: Xác định **năng lực cốt lõi** của mô hình và **mục đích tổng thể** của nó.
+- **Contextual prompt**: Cung cấp **thông tin cụ thể theo nhiệm vụ** để hướng dẫn mô hình trả lời. Nó rất **đặc thù cho nhiệm vụ hoặc dữ liệu hiện tại**, và có tính **động**.
+- **Role prompt**: Xác định **phong cách và giọng điệu** của đầu ra mô hình. Nó **thêm một lớp đặc thù và cá tính** cho phản hồi.
+
+**Phân biệt giữa system prompt, contextual prompt và role prompt** cung cấp một khuôn khổ (framework) để thiết kế prompt với mục đích rõ ràng, cho phép kết hợp linh hoạt và dễ dàng phân tích cách mỗi loại prompt ảnh hưởng đến đầu ra của mô hình ngôn ngữ. Hãy cùng tìm hiểu ba loại prompt khác nhau này:
+
+### System prompting
+
