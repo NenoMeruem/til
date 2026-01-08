@@ -2,11 +2,17 @@
 Author: Lee Boonstra 
 
 
-"You don’t need to be a data scientist or a machine learning  engineer – everyone can write  a prompt."
+"You don’t need to be a data scientist or a machine learning engineer – everyone can write  a prompt."
 
 Node: [[books]]
 Tags: #book , #ai
-## Introduce
+
+## Introduction
+
+
+
+
+## Prompt engineering
 
 Hãy nhớ cách một mô hình ngôn ngữ lớn (LLM) hoạt động; nó là một **công cụ dự đoán**. Mô hình nhận **văn bản tuần tự** làm đầu vào, rồi **dự đoán token (đơn vị ngôn ngữ) tiếp theo** sẽ là gì, dựa trên dữ liệu mà nó đã được huấn luyện.
 
@@ -14,7 +20,7 @@ LLM được vận hành để lặp lại quá trình này nhiều lần — m�
 
 Việc dự đoán token tiếp theo **dựa trên mối quan hệ** giữa các token trước đó và **những gì LLM đã học được trong quá trình huấn luyện**.
 
-Khi bạn viết một **prompt** (lời nhắc), bạn đang cố gắng thiết lập cho **LLM** (mô hình ngôn ngữ lớn) dự đoán đúng chuỗi **token** (đơn vị ngôn ngữ) tiếp theo. **Kỹ thuật thiết kế prompt** (prompt engineering) là quá trình tạo ra những prompt chất lượng cao nhằm hướng dẫn LLM tạo ra các kết quả chính xác.
+Khi bạn viết một **prompt** , bạn đang cố gắng thiết lập cho **LLM** (mô hình ngôn ngữ lớn) dự đoán đúng chuỗi **token** (đơn vị ngôn ngữ) tiếp theo. **Kỹ thuật thiết kế prompt** (prompt engineering) là quá trình tạo ra những prompt chất lượng cao nhằm hướng dẫn LLM tạo ra các kết quả chính xác.
 
 Quá trình này bao gồm việc thử nghiệm để tìm ra prompt hiệu quả nhất, tối ưu độ dài của prompt, và đánh giá phong cách viết cũng như cấu trúc của prompt trong mối liên hệ với nhiệm vụ được giao.
 
