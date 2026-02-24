@@ -315,7 +315,46 @@ Có thể có sự chồng chéo đáng kể giữa **system prompt**, **conte
 - **Contextual prompt**: Cung cấp **thông tin cụ thể theo nhiệm vụ** để hướng dẫn mô hình trả lời. Nó rất **đặc thù cho nhiệm vụ hoặc dữ liệu hiện tại**, và có tính **động**.
 - **Role prompt**: Xác định **phong cách và giọng điệu** của đầu ra mô hình. Nó **thêm một lớp đặc thù và cá tính** cho phản hồi.
 
-**Phân biệt giữa system prompt, contextual prompt và role prompt** cung cấp một khuôn khổ (framework) để thiết kế prompt với mục đích rõ ràng, cho phép kết hợp linh hoạt và dễ dàng phân tích cách mỗi loại prompt ảnh hưởng đến đầu ra của mô hình ngôn ngữ. Hãy cùng tìm hiểu ba loại prompt khác nhau này:
+**Phân biệt giữa system prompt, contextual prompt và role prompt** cung cấp một khuôn khổ (framework) để thiết kế prompt với mục đích rõ ràng, cho phép kết hợp linh hoạt và dễ dàng phân tích cách mỗi loại prompt ảnh hưởng đến đầu ra của mô hình ngôn ngữ. Hãy cùng tìm hiểu ba loại prompt khác nhau này
 
 ### System prompting
+
+**Bảng 3** chứa một _system prompt_, trong đó tôi chỉ định thêm các thông tin về cách mô hình phải trả về _output_. Tôi đã tăng **temperature** để đạt mức độ sáng tạo cao hơn và đồng thời thiết lập **token limit** cao hơn. Tuy nhiên, nhờ các chỉ dẫn rõ ràng về định dạng và nội dung đầu ra, mô hình không sinh thêm văn bản dư thừa ngoài yêu cầu.
+
+
+<table>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Classify movie reviews as positive, neutral or negative.</td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >1</td>
+    <th >Token Limit</th>
+    <td >5</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>40</td>
+      <th>Top P</th>
+     <td>0.8</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Classify movie reviews as positive, neutral or negative. Only  return the label in uppercase.  Review: "Her" is a disturbing study revealing the direction  humanity is headed if AI is allowed to keep evolving,  unchecked. It's so disturbing I couldn't watch it.  Sentiment:    </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">NEGATIVE</td>
+</tr>
+</table>
+
+
+**System prompt** có thể được sử dụng để tạo ra đầu ra đáp ứng các yêu cầu cụ thể. Thuật ngữ _“system prompt”_ thực chất mang ý nghĩa là _“cung cấp một nhiệm vụ bổ sung cho hệ thống”_. Ví dụ, bạn có thể sử dụng system prompt để:
+- Sinh ra một **đoạn mã (code snippet)** tương thích với một **ngôn ngữ lập trình cụ thể**.
+- Yêu cầu hệ thống **trả về kết quả theo một cấu trúc nhất định** (ví dụ: JSON, XML, hoặc schema tùy chỉnh).
 
