@@ -9,8 +9,33 @@ Tags: #book , #ai
 
 ## Introduction
 
+Khi xem xét **input** và **output** của một _large language model (LLM)_, **prompt** (chuỗi văn bản đầu vào, đôi khi kết hợp thêm các _modalities_ khác như _image prompt_) chính là dữ liệu mà mô hình sử dụng để **suy luận (inference)** và dự đoán ra kết quả đầu ra mong muốn.
 
+Bạn không cần phải là _data scientist_ hay _machine learning engineer_ để viết prompt — bất kỳ ai cũng có thể làm điều đó. Tuy nhiên, việc **thiết kế prompt tối ưu (prompt engineering)** lại không hề đơn giản.
 
+Hiệu quả của một prompt phụ thuộc vào nhiều yếu tố, bao gồm:
+
+- **Model** bạn sử dụng (kiến trúc, khả năng xử lý)
+- **Training data** (dữ liệu huấn luyện của mô hình)
+- **Model configurations** (các tham số cấu hình như temperature, max tokens, v.v.)
+- **Word choice** (lựa chọn từ ngữ)
+- **Style & tone** (phong cách và giọng điệu)
+- **Structure** (cấu trúc prompt)
+- **Context** (ngữ cảnh cung cấp cho mô hình)
+
+Do đó, _prompt engineering_ là một quá trình **lặp (iterative process)** — bạn cần thử nghiệm, đánh giá và tinh chỉnh nhiều lần để đạt được kết quả tốt nhất.
+
+Một prompt không được thiết kế tốt có thể dẫn đến:
+
+- Kết quả **mơ hồ (ambiguous output)**
+- Thông tin **không chính xác (inaccurate response)**
+- Và làm giảm khả năng của mô hình trong việc tạo ra **output có ý nghĩa (meaningful output)**
+
+Khi bạn tương tác với chatbot Gemini, về cơ bản bạn đang **viết các prompt (câu lệnh đầu vào)**. Tuy nhiên, tài liệu này tập trung vào việc xây dựng prompt cho mô hình Gemini khi triển khai trong **Vertex AI** hoặc thông qua **API**, bởi vì khi gọi trực tiếp đến model, bạn có thể truy cập và tùy chỉnh các **tham số cấu hình (configuration parameters)** như _temperature_, _top-p_, v.v.
+
+Tài liệu này sẽ đi sâu vào **prompt engineering (kỹ thuật thiết kế prompt)**. Chúng ta sẽ cùng phân tích các **kỹ thuật prompting khác nhau** nhằm giúp bạn nhanh chóng bắt đầu, đồng thời chia sẻ các **best practices (thực tiễn tốt nhất)** để nâng cao kỹ năng và trở thành một “prompt engineer” hiệu quả.
+
+Ngoài ra, tài liệu cũng đề cập đến một số **thách thức (challenges)** mà bạn có thể gặp phải trong quá trình thiết kế prompt, chẳng hạn như kiểm soát đầu ra của mô hình, tránh sai lệch ngữ nghĩa, hoặc tối ưu hiệu suất phản hồi.
 
 ## Prompt engineering
 
@@ -300,7 +325,6 @@ Nếu mục tiêu của bạn là tạo ra kết quả **ổn định (robust)*
 - Tổng quát hóa tốt hơn
 - Giảm lỗi trong các tình huống thực tế
 - Hoạt động đáng tin cậy hơn khi gặp dữ liệu không chuẩn
-
 
 ### System, contextual and role prompting 
 
