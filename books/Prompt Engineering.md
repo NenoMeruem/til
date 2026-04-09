@@ -26,7 +26,6 @@ Hiệu quả của một prompt phụ thuộc vào nhiều yếu tố, bao gồm
 Do đó, _prompt engineering_ là một quá trình **lặp (iterative process)** — bạn cần thử nghiệm, đánh giá và tinh chỉnh nhiều lần để đạt được kết quả tốt nhất.
 
 Một prompt không được thiết kế tốt có thể dẫn đến:
-
 - Kết quả **mơ hồ (ambiguous output)**
 - Thông tin **không chính xác (inaccurate response)**
 - Và làm giảm khả năng của mô hình trong việc tạo ra **output có ý nghĩa (meaningful output)**
@@ -586,4 +585,163 @@ Ngoài ra, step-back prompting còn:
 Nói cách khác, kỹ thuật này thay đổi cách xây dựng **final prompt** bằng cách “bơm” thêm ngữ cảnh tri thức, giúp mô hình khai thác tối đa năng lực suy luận vốn có, thay vì phản hồi một cách trực tiếp và đôi khi hời hợt.
 
 Tiếp theo, chúng ta sẽ xem các ví dụ minh họa để hiểu rõ hơn cách step-back prompting cải thiện kết quả. Trước tiên, hãy xem một **prompt truyền thống** (Bảng 8), sau đó so sánh với **step-back prompt** (Bảng 9).
+
+
+<table>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Write a storyline for a level of a first-person shooter video game. </td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >1</td>
+    <th >Token Limit</th>
+    <td >1024</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>40</td>
+      <th>Top P</th>
+     <td>0.8</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Write a one paragraph storyline for a new level of a firstperson shooter video game that is challenging and engaging. </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">The level begins with the player’s squad being ambushed in a dense urban area  by a relentless enemy faction. Players must fight their way through a maze of  back alleys and dilapidated buildings, utilizing stealth and precision to eliminate  enemy forces and avoid detection. The player must use their environment to their  advantage, setting traps, utilizing cover, and making calculated moves to survive.  Along the way, they uncover intel suggesting the enemy is planning a devastating  attack, and the player must race against time to gather evidence and relay it back  to their headquarters before the enemy can carry out their plans. </td>
+</tr>
+</table>
+
+Khi bạn đặt (temperature) là 1, bạn có thể nhận được đủ loại nội dung sáng tạo cho một cốt truyện, nhưng nó cũng khá ngẫu nhiên và mang tính chung chung. Vì vậy, hãy lùi lại một bước:
+
+
+
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Based on popular first-person shooter action games, what are  5 fictional key settings that contribute to a challenging and  engaging level storyline in a first-person shooter video game?  </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">1. **Abandoned Military Base**: A sprawling, post-apocalyptic military complex  crawling with mutated soldiers and rogue robots, ideal for challenging  firearm combat.  2. **Cyberpunk City**: A neon-lit, futuristic urban environment with towering  skyscrapers and dense alleyways, featuring cybernetically enhanced enemies  and hacking mechanics.  3. **Alien Spaceship**: A vast alien vessel stranded on Earth, with eerie  corridors, zero-gravity sections, and extraterrestrial creatures to encounter.  4. **Zombie-Infested Town**: A desolate town overrun by hordes of aggressive  zombies, featuring intense close-quarters combat and puzzle-solving to find  safe passage.  5. **Underwater Research Facility**: A deep-sea laboratory flooded with water,  filled with mutated aquatic creatures, and requiring stealth and underwater  exploration skills to survive.  </td>
+</tr>
+</table>
+
+Vâng, những chủ đề đó có vẻ phù hợp cho một trò chơi điện tử góc nhìn thứ nhất. Hãy quay lại yêu cầu ban đầu, nhưng lần này chúng ta đưa câu trả lời của bước lùi lại làm ngữ cảnh và xem nó sẽ trả về điều gì.
+
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Context: 5 engaging themes for a first person shooter video game:  1. **Abandoned Military Base**: A sprawling, post-apocalyptic  military complex crawling with mutated soldiers and rogue  robots, ideal for challenging firearm combat.  2. **Cyberpunk City**: A neon-lit, futuristic urban environment  with towering skyscrapers and dense alleyways, featuring  cybernetically enhanced enemies and hacking mechanics.  3. **Alien Spaceship**: A vast alien vessel stranded on  Earth, with eerie corridors, zero-gravity sections, and  extraterrestrial creatures to encounter.  4. **Zombie-Infested Town**: A desolate town overrun by hordes of  aggressive zombies, featuring intense close-quarters combat and  puzzle-solving to find safe passage.  5. **Underwater Research Facility**: A deep-sea laboratory flooded  with water, filled with mutated aquatic creatures, and requiring  stealth and underwater exploration skills to survive.  Take one of the themes and write a one paragraph storyline  for a new level of a first-person shooter video game that is  challenging and engaging. </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">In the heart of a murky abyss, lies a dilapidated underwater research facility,  standing as a testament to human ambition and its disastrous consequences.  Shrouded in darkness, pulsating with the hum of malfunctioning machinery, and  haunted by the echoes of drowned souls, the facility is now a breeding ground for  a nightmare borne from the deep sea. The player, an elite marine equipped with  advanced diving gear and experimental weaponry, is tasked with venturing into  this aquatic realm of terror. Armed with resilience and resourcefulness, they must  navigate treacherous corridors, solve cryptic puzzles, and confront gruesome sea  monstrosities that lurk in the depths. From grappling with the crushing pressure  of the deep sea to outsmarting cunning aquatic predators, every moment in this  uncharted underworld tests the limits of human endurance and courage. </td>
+</tr>
+</table>
+
+
+
+Đó trông giống như một trò chơi điện tử thú vị! Bằng cách sử dụng các kỹ thuật “step-back prompting” (đặt câu hỏi lùi lại một bước), bạn có thể tăng độ chính xác của các prompt của mình. 
+
+### Chain of Thought (CoT) 
+
+
+Kỹ thuật **Chain of Thought (CoT) prompting** là một phương pháp trong lĩnh vực **xử lý ngôn ngữ tự nhiên (NLP)**nhằm cải thiện khả năng suy luận của các **mô hình ngôn ngữ lớn (LLMs)** bằng cách tạo ra các bước suy luận trung gian (intermediate reasoning steps). Cách tiếp cận này giúp mô hình đưa ra câu trả lời chính xác hơn thay vì chỉ dự đoán trực tiếp đầu ra.
+
+Bạn cũng có thể kết hợp CoT với **few-shot prompting** (cung cấp một số ví dụ mẫu) để đạt hiệu quả tốt hơn trong các bài toán phức tạp — đặc biệt là những bài toán đòi hỏi suy luận trước khi phản hồi. Điều này rất hữu ích vì **zero-shot chain of thought** (không có ví dụ mẫu) thường gặp khó khăn trong các tác vụ reasoning.
+
+### Ưu điểm của CoT prompting
+
+- **Hiệu quả cao với chi phí thấp**: Không cần **fine-tuning** mô hình, vẫn có thể cải thiện đáng kể chất lượng đầu ra.
+- **Tương thích với các LLM có sẵn (off-the-shelf models)**: Có thể áp dụng trực tiếp mà không cần huấn luyện lại.
+- **Tính diễn giải (interpretability)**: Bạn có thể quan sát các bước suy luận của mô hình, từ đó hiểu cách nó đi đến kết quả.
+- **Dễ debug**: Khi có lỗi (malfunction), bạn có thể xác định chính xác bước suy luận nào gặp vấn đề.
+- **Tăng độ ổn định (robustness)**: Khi chuyển giữa các phiên bản LLM khác nhau, prompt sử dụng CoT thường ít bị “trôi hiệu năng” (performance drift) hơn so với prompt không có chuỗi suy luận.
+### Nhược điểm của CoT prompting
+
+- **Tăng số lượng token đầu ra**: Vì mô hình phải sinh thêm các bước suy luận, dẫn đến:
+    - Chi phí suy luận (inference cost) cao hơn
+    - Thời gian phản hồi lâu hơn
+	- Điều này có thể ảnh hưởng đến các hệ thống cần tối ưu về latency hoặc chi phí vận hành.
+
+Để minh họa cho ví dụ trong **Bảng 11 (Table 11)**, trước tiên ta sẽ thử xây dựng một prompt **không sử dụng CoT prompting**, nhằm làm rõ những hạn chế (flaws) của mô hình ngôn ngữ lớn khi không có hướng dẫn suy luận từng bước.
+
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">When I was 3 years old, my partner was 3 times my age. Now, I  am 20 years old. How old is my partner?. </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">63 years old. </td>
+</tr>
+</table>
+
+Yikes. Rõ ràng đây là một kết quả sai.
+Thực tế, các **LLM (Large Language Models)** thường gặp khó khăn với các tác vụ liên quan đến toán học và có thể đưa ra kết quả không chính xác — ngay cả với những phép toán đơn giản như nhân hai số.
+Nguyên nhân là vì chúng được **huấn luyện trên tập dữ liệu văn bản quy mô lớn (large-scale text corpus)**, trong khi các bài toán toán học thường đòi hỏi một **phương pháp xử lý khác**, mang tính suy luận logic và tính toán chính xác hơn, thay vì chỉ dựa trên **pattern recognition**.
+Vì vậy, hãy thử kiểm tra xem việc bổ sung các **bước suy luận trung gian (intermediate reasoning steps)** có giúp cải thiện chất lượng đầu ra (**output quality**) hay không.
+
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">When I was 3 years old, my partner was 3 times my age. Now,  I am 20 years old. How old is my partner? Let's think step  by step.  </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">1. Let’s assume my current age is “x” years.  2. When I was 3 years old, my age was 3 years.  3. My partner’s age at that time was 3 times my age, which means my partner’s  age was 3 * 3 = 9 years.  4. Now, I am 20 years old, which means my age has increased by 20 - 3 = 17  years since I was 3 years old.  5. Since my partner’s age was 9 years when I was 3 years old, and my age has  increased by 17 years, my partner’s age must have also increased by 17 years.  6. Therefore, my partner’s current age is 9 + 17 = 26 years.  So, my partner is 26 years old. </td>
+</tr>
+</table>
+
+
+Được rồi, bây giờ câu trả lời cuối cùng đã chính xác. Điều này là do chúng ta đã **rõ ràng yêu cầu LLM (Large Language Model)** giải thích từng bước thay vì chỉ trả về kết quả.
+
+Điều thú vị là mô hình đã cộng dồn 17 năm tăng thêm. Trong suy nghĩ của tôi, tôi sẽ tính theo cách khác: lấy chênh lệch số tuổi giữa tôi và đối tác, rồi cộng lại, ví dụ: _(20 + (9 - 3))_.
+
+Hãy thử **điều chỉnh prompt / hướng dẫn (instruction tuning)** để giúp mô hình “suy nghĩ” gần giống với cách tư duy của tôi hơn — tức là tối ưu hóa cách nó **phân rã bài toán (problem decomposition)** và **suy luận từng bước (step-by-step reasoning / chain-of-thought)**.
+
+Bảng 12 là một ví dụ về “Chain of Thought” ở chế độ “zero-shot”. Phương pháp gợi ý theo chuỗi suy nghĩ (Chain of Thought prompting) có thể rất mạnh mẽ khi được kết hợp với “single-shot” hoặc “few-shot”, như bạn có thể thấy trong Bảng 13.
+
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Q: When my brother was 2 years old, I was double his age. Now  I am 40 years old. How old is my brother? Let's think step  by step.  A: When my brother was 2 years, I was 2 * 2 = 4 years old.  That's an age difference of 2 years and I am older. Now I am 40  years old, so my brother is 40 - 2 = 38 years old. The answer  is 38.  Q: When I was 3 years old, my partner was 3 times my age. Now,  I am 20 years old. How old is my partner? Let's think step  by step.  A: </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">1. Let’s assume my current age is “x” years.  2. When I was 3 years old, my age was 3 years.  3. My partner’s age at that time was 3 times my age, which means my partner’s  age was 3 * 3 = 9 years.  4. Now, I am 20 years old, which means my age has increased by 20 - 3 = 17  years since I was 3 years old.  5. Since my partner’s age was 9 years when I was 3 years old, and my age has  increased by 17 years, my partner’s age must have also increased by 17 years.  6. Therefore, my partner’s current age is 9 + 17 = 26 years.  So, my partner is 26 years old. </td>
+</tr>
+</table>
+
+
+**Chain of Thought (CoT)** có thể hữu ích trong nhiều trường hợp sử dụng khác nhau trong lập trình và AI.
+Hãy xem xét một số ví dụ:
+- Trong **sinh mã (code generation)**, CoT giúp bạn phân rã yêu cầu (problem decomposition) thành nhiều bước nhỏ, sau đó ánh xạ (mapping) từng bước này thành các dòng lệnh cụ thể trong mã nguồn.
+- Khi **tạo dữ liệu tổng hợp (synthetic data generation)**, đặc biệt khi bạn có một “seed” ban đầu (ví dụ: _“Sản phẩm có tên là XYZ”_), CoT cho phép bạn xây dựng mô tả bằng cách hướng dẫn mô hình từng bước suy luận (guided reasoning), dựa trên các giả định hợp lý từ tên sản phẩm.
+
+Nói chung, bất kỳ tác vụ nào có thể được giải quyết bằng cách **diễn giải từng bước (step-by-step reasoning)** đều là ứng viên phù hợp để áp dụng Chain of Thought.
+Nếu bạn có thể giải thích quy trình để giải quyết vấn đề một cách rõ ràng và tuần tự, thì hãy cân nhắc sử dụng CoT.
+
+Vui lòng tham khảo notebook10 được lưu trữ trong kho Github của GoogleCloudPlatform, nơi sẽ đi sâu hơn vào kỹ thuật gợi ý CoT (Chain of Thought): Trong phần các phương pháp hay nhất của chương này, chúng ta sẽ tìm hiểu một số thực tiễn tốt nhất dành riêng cho kỹ thuật gợi ý theo chuỗi suy nghĩ.
+
+### Self-consistency 
+
+Mặc dù các mô hình ngôn ngữ lớn (Large Language Models – LLMs) đã đạt được những thành công ấn tượng trong nhiều tác vụ xử lý ngôn ngữ tự nhiên (NLP), khả năng **lập luận (reasoning)** của chúng vẫn thường bị xem là một hạn chế — và hạn chế này không thể chỉ khắc phục bằng cách đơn thuần tăng kích thước mô hình (model scaling).
+
+Như đã đề cập trong phần **Chain of Thought (CoT) prompting**, mô hình có thể được “prompt” để sinh ra các bước suy luận trung gian, tương tự cách con người giải quyết bài toán từng bước. Tuy nhiên, CoT thường sử dụng chiến lược **greedy decoding** (giải mã tham lam) — tức là tại mỗi bước chỉ chọn token có xác suất cao nhất. Cách tiếp cận này làm giảm tính đa dạng của các chuỗi suy luận, từ đó hạn chế hiệu quả tổng thể.
+
+Phương pháp **Self-consistency** cải thiện điểm yếu này bằng cách kết hợp:
+- **Sampling (lấy mẫu)**: sinh ra nhiều chuỗi suy luận khác nhau thay vì chỉ một.
+- **Majority voting (bỏ phiếu đa số)**: chọn đáp án xuất hiện nhiều nhất trong các kết quả.
+
+Nhờ đó, mô hình có thể khám phá nhiều “reasoning paths” (đường suy luận) khác nhau và chọn ra câu trả lời có tính nhất quán cao nhất. Kết quả là độ chính xác (accuracy) và tính mạch lạc (coherence) của đầu ra được cải thiện đáng kể.
+
+Tuy nhiên, Self-consistency thực chất chỉ cung cấp một dạng **pseudo-probability** (xác suất giả định) về khả năng một câu trả lời là đúng, và đi kèm với chi phí tính toán cao (high computational cost), do phải sinh và xử lý nhiều mẫu đầu ra.
 
