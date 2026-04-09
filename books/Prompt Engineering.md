@@ -758,3 +758,44 @@ Hãy xem ví dụ về **hệ thống phân loại email (email classification 
 
 Lưu ý rằng **giọng văn thân thiện, cách chọn từ và cả sự mỉa mai trong email** đều có thể **gây “bẫy” cho LLM**, khiến mô hình đưa ra các suy luận khác nhau hoặc lỗi trong phân loại.
 
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">EMAIL:  ```  Hi,  I have seen you use Wordpress for your website. A great open  source content management system. I have used it in the past  too. It comes with lots of great user plugins. And it's pretty  easy to set up.  I did notice a bug in the contact form, which happens when  you select the name field. See the attached screenshot of me  entering text in the name field. Notice the JavaScript alert  box that I inv0k3d.  But for the rest it's a great website. I enjoy reading it. Feel  free to leave the bug in the website, because it gives me more  interesting things to read.  Cheers,  Harry the Hacker.  ```  Classify the above email as IMPORTANT or NOT IMPORTANT. Let's  think step by step and explain why. </td>
+  </tr>
+  <tr>
+    <th>Output 1</th>
+    <td colspan="3">**Step 1: Identify the purpose of the email.**  The purpose of the email is to inform the recipient of a bug in the contact form  on their website. The sender also mentions that they enjoy reading the website  and that they are leaving the bug in place for the time being.  **Step 2: Assess the potential impact of the bug.**  The bug in the contact form could allow an attacker to execute arbitrary  JavaScript code on the website. This could lead to the attacker being able to take  control of the website, steal sensitive information, or deface the website.  **Step 3: Consider the credibility of the sender.**  The sender of the email claims to be a hacker named Harry. However, there is no  way to verify the sender’s identity. It is possible that the sender is a legitimate  hacker who is trying to help the recipient, but it is also possible that the sender  is a malicious actor who is trying to trick the recipient into clicking on a malicious  link or downloading a malicious file.  **Conclusion: IMPORTANT**  Based on the potential impact of the bug and the credibility of the sender,  the email should be classified as **IMPORTANT**. The recipient should take  immediate action to fix the bug and protect their website from attack. </td>
+</tr>
+<tr>
+    <th>Output 2</th>
+    <td colspan="3">**Explanation:**  1. **Lack of urgency:** The email does not convey any sense of urgency or  time-sensitivity. It starts with a casual greeting and presents the information  in a matter-of-fact tone.  2. **Non-critical bug report:** The bug reported in the contact form is  described as interesting but not critical. The email sender even suggests that  the website owner can leave the bug in place.  3. **Lack of personal impact:** The email does not indicate any direct or  personal impact on the website owner. It simply mentions that the sender  enjoys reading the website. 4. **Absence of action request:** The email does not explicitly request any  action from the website owner. It does not ask for the bug to be fixed or  provide any specific suggestions for improvement.  5. **Sender’s intent:** The sender’s intention seems to be more focused on  sharing an observation and expressing interest in the website rather than  raising a serious concern or requesting assistance.  **Conclusion: NOT IMPORTANT** </td>
+</tr>
+<tr>
+    <th>Output 3</th>
+    <td colspan="3">**Step 1: Identify the purpose of the email.**  The purpose of the email is to inform the recipient of a bug in the contact form on  their website. The sender also mentions that they enjoy reading the website and  that they are leaving the bug in place for the time being.  **Step 2: Assess the potential impact of the bug.**  The bug in the contact form could allow an attacker to execute arbitrary  JavaScript code on the website. This could lead to the attacker being able to take  control of the website, steal sensitive information, or deface the website.  **Step 3: Consider the credibility of the sender.**  The sender of the email claims to be a hacker named Harry. However, there is no  way to verify the sender’s identity. It is possible that the sender is a legitimate  hacker who is trying to help the recipient, but it is also possible that the sender is  a malicious actor who is trying to exploit the bug for their own gain.  **Conclusion:**  Based on the above factors, the email should be classified as **IMPORTANT**.  The bug in the contact form is a serious security risk, and the sender’s credibility  is unknown. The recipient should take immediate action to fix the bug and </td>
+</tr>
+</table>
+
+
+Bạn có thể sử dụng đoạn lệnh trên và thử xem nó có trả về một phân loại nhất quán hay không. Tùy thuộc vào mô hình mà bạn đang sử dụng và cấu hình nhiệt độ (temperature), nó có thể trả về “QUAN TRỌNG” hoặc “KHÔNG QUAN TRỌNG”. Không rõ.
+
+Bằng cách tạo ra nhiều chuỗi suy nghĩ (**Chains of Thought**) và chọn câu trả lời xuất hiện phổ biến nhất (**“IMPORTANT”**), chúng ta có thể nhận được kết quả chính xác và nhất quán hơn từ mô hình ngôn ngữ lớn (LLM). Ví dụ này cho thấy phương pháp gợi ý tự nhất quán (**self-consistency prompting**) có thể được sử dụng để cải thiện độ chính xác trong phản hồi của LLM bằng cách xem xét nhiều góc độ khác nhau và lựa chọn câu trả lời có tính thống nhất cao nhất.
+
+### Tree of Thoughts (ToT) 
+
+Sau khi đã làm quen với kỹ thuật chuỗi suy nghĩ (**Chain of Thought**) và gợi ý tự nhất quán (**Self-consistency prompting**), chúng ta hãy cùng xem xét phương pháp Cây suy nghĩ (**Tree of Thoughts - ToT**). Phương pháp này khái quát hóa khái niệm gợi ý CoT vì nó cho phép các mô hình ngôn ngữ lớn (LLM) khám phá đồng thời nhiều lộ trình lập luận khác nhau, thay vì chỉ tuân theo một chuỗi suy nghĩ tuyến tính duy nhất. Điều này được mô tả trong Hình...
+
+![[Pasted image 20260409162343.png]]
+
+
+
+Hình 1. Minh họa phương pháp “chain of thought prompting” bên trái so với phương pháp “Tree of Thoughts prompting” bên phải.
+
+Cách tiếp cận này khiến **Tree of Thought (ToT)** đặc biệt phù hợp với các **task** phức tạp đòi hỏi khả năng **exploration**. Nó hoạt động bằng cách duy trì một **cây suy nghĩ (tree of thoughts)**, trong đó mỗi **thought** đại diện cho một **chuỗi ngôn ngữ (language sequence)** mạch lạc, đóng vai trò như một **intermediate step** hướng tới việc giải quyết vấn đề.
+
+Mô hình sau đó có thể **khám phá (explore)** các **reasoning path** khác nhau bằng cách **branch out** từ các **node** khác nhau trong cây. Có một **notebook** rất hay, đi vào chi tiết hơn và minh họa **The Tree of Thought (ToT)**, được phát triển dựa trên bài báo _‘Large Language Model Guided Tree-of-Thought’_.
+
+
+### ReAct (reason & act) 
+
