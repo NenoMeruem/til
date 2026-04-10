@@ -799,3 +799,128 @@ Mô hình sau đó có thể **khám phá (explore)** các **reasoning path**
 
 ### ReAct (reason & act) 
 
+**ReAct (Reason and Act) prompting** [10]13 là một _paradigm_ (mô hình phương pháp) giúp các **LLM (Large Language Models)** giải quyết các bài toán phức tạp bằng cách kết hợp **suy luận ngôn ngữ tự nhiên (natural language reasoning)** với việc sử dụng **các công cụ bên ngoài** (ví dụ: _search engine_, _code interpreter_, v.v.).
+
+Cách tiếp cận này cho phép LLM thực hiện các **action (hành động)** cụ thể, chẳng hạn như gọi **external APIs** để truy xuất dữ liệu — đây được xem là bước đầu tiên hướng tới việc xây dựng **AI agents (mô hình tác nhân)**.
+
+ReAct mô phỏng cách con người hoạt động trong thế giới thực: chúng ta thường **suy luận bằng lời nói (verbal reasoning)** và sau đó thực hiện hành động để thu thập thêm thông tin. Nhờ đó, ReAct đạt hiệu suất tốt hơn so với nhiều phương pháp **prompt engineering** khác trong nhiều lĩnh vực khác nhau.
+
+ ReAct prompting vận hành dựa trên một vòng lặp gọi là **thought–action loop**:
+1. **Reasoning (Suy luận)**  
+    LLM phân tích vấn đề và xây dựng một **kế hoạch hành động (plan of action)**.
+2. **Acting (Hành động)**  
+    Mô hình thực thi các hành động đã đề ra (ví dụ: gọi API, tìm kiếm dữ liệu, chạy code).
+3. **Observation (Quan sát)**  
+    LLM thu thập kết quả từ các hành động đó.
+4. **Update (Cập nhật suy luận)**  
+    Dựa trên dữ liệu quan sát được, mô hình điều chỉnh lại suy luận và tạo kế hoạch mới.
+
+Quá trình này lặp lại liên tục cho đến khi LLM tìm ra **giải pháp cuối cùng (final solution)** cho bài toán.
+
+Triển khai thực tế. Để hiểu rõ cách hoạt động của ReAct, bạn cần triển khai bằng code. Trong _code snippet_ được đề cập, tác giả sử dụng:
+- **LangChain framework (Python)**: để xây dựng pipeline cho LLM và agent
+- **Vertex AI (google-cloud-aiplatform)**: nền tảng AI của Google
+- **google-search-results (pip package)**: để tích hợp khả năng tìm kiếm dữ liệu từ bên ngoài
+
+Sự kết hợp này cho phép xây dựng một hệ thống ReAct hoàn chỉnh, nơi LLM có thể vừa suy luận vừa tương tác với thế giới bên ngoài thông qua các công cụ.
+
+Để chạy ví dụ này, bạn phải tạo một khóa SerpAPI (miễn phí) từ [https://serpapi.com/manageapi-key](https://serpapi.com/manageapi-key) và thiết lập một biến môi trường SERPAPI_API_KEY.
+
+Tiếp theo, hãy viết một số mã Python, với nhiệm vụ để mô hình ngôn ngữ (LLM) tìm ra: Có bao nhiêu đứa trẻ có người cha nổi tiếng biểu diễn trong ban nhạc Metallica.
+
+
+```python
+
+from langchain.agents import load_tools  
+from langchain.agents import initialize_agent  
+from langchain.agents import AgentType  
+from langchain.llms import VertexAI  
+
+prompt = "How many kids do the band members of Metallica have?"  
+
+llm = VertexAI(temperature=0.1)  
+tools = load_tools(["serpapi"], llm=llm)  
+
+agent = initialize_agent(tools, llm, agent=AgentType.ZERO_SHOT_REACT_DESCRIPTION, verbose=True)
+agent.run(prompt) 
+
+```
+
+Đoạn Code Snippet 2 minh họa kết quả thu được. Có thể thấy rõ rằng ReAct thực hiện một chuỗi gồm năm truy vấn tìm kiếm liên tiếp (_search chain_). Thực chất, mô hình ngôn ngữ lớn (LLM) đang “scrape” dữ liệu từ kết quả tìm kiếm của Google để suy luận và xác định tên các ban nhạc.
+
+Sau mỗi lần truy vấn, hệ thống ghi nhận các kết quả dưới dạng _observations_ (quan sát), sau đó sử dụng các thông tin này để tiếp tục xây dựng _chain-of-thought_ (chuỗi suy luận) cho truy vấn kế tiếp.
+
+```
+
+> Entering new AgentExecutor chain...   
+Metallica has 4 members.  
+Action: Search  
+Action Input: How many kids does James Hetfield have?  
+Observation: three children  
+Thought: 1/4 Metallica band members have 3 children  
+Action: Search  
+Action Input: How many kids does Lars Ulrich have?  
+Observation: 3  
+Thought: 2/4 Metallica band members have 6 children  
+Action: Search  Action Input: How many kids does Kirk Hammett have?  Observation: Hammett has been married to his second wife Lani since 1998.  They have two sons, Angel (b. September 29, 2006) and Vincenzo (b. June  28, 2008).  
+Thought: 3/4 Metallica band members have 8 children  
+Action: Search  Action Input: How many kids does Robert Trujillo have?  Observation: 2  
+Thought: 4/4 Metallica band members have 10 children  
+Final Answer: 10 
+
+```
+
+Đoạn **Code Snippet 2** xác định rằng ban nhạc **Metallica** có bốn thành viên. Sau đó, nó thực hiện việc **truy vấn (query)**từng thành viên để lấy thông tin về tổng số con của họ, rồi tiến hành **tổng hợp (aggregate)** dữ liệu này lại. Cuối cùng, hệ thống trả về **tổng số con** như là kết quả cuối cùng.
+
+Trong thực tế, kỹ thuật **ReAct prompting** yêu cầu bạn hiểu rằng bạn cần liên tục **gửi lại (resend)** các prompt và response trước đó trong mỗi vòng lặp suy luận. Đồng thời, bạn cũng phải thực hiện **cắt tỉa (trimming)** các nội dung được sinh ra không cần thiết để tránh làm nhiễu ngữ cảnh. Bên cạnh đó, việc **thiết lập (configure)** mô hình với các **ví dụ (examples)** và **hướng dẫn (instructions)** phù hợp là rất quan trọng để đảm bảo chất lượng đầu ra.
+
+Bạn có thể tham khảo **notebook14** được lưu trữ trong repository **GoogleCloudPlatform trên GitHub**, nơi cung cấp giải thích chi tiết hơn, bao gồm cả các **input/output thực tế của LLM** với một ví dụ phức tạp hơn.
+
+
+### Automatic Prompt Engineering 
+
+Tại thời điểm này, bạn có thể nhận ra rằng việc **thiết kế prompt (prompt engineering)** không hề đơn giản. Sẽ thật tiện lợi nếu chúng ta có thể **tự động hóa quá trình này** (tức là viết một prompt để tạo ra các prompt khác). Và đúng vậy — đã có một phương pháp gọi là **Automatic Prompt Engineering (APE)**.
+
+APE là một kỹ thuật giúp **giảm thiểu sự can thiệp thủ công của con người (human input)**, đồng thời **cải thiện hiệu năng của mô hình (model performance)** trên nhiều tác vụ khác nhau.
+
+Cách hoạt động cơ bản của APE như sau:
+- Bạn sử dụng một mô hình (LLM) để **generate (sinh) nhiều prompt khác nhau**.
+- Sau đó **đánh giá (evaluate)** các prompt này dựa trên chất lượng đầu ra.
+- Lựa chọn những prompt tốt, có thể **tinh chỉnh (refine / optimize)** thêm.
+- Và **lặp lại vòng lặp (iteration loop)** này để ngày càng tối ưu hơn.
+
+Ví dụ: bạn có thể áp dụng APE để hỗ trợ **huấn luyện chatbot (chatbot training)** cho một **webshop bán áo thun merchandise**. Mục tiêu là xác định tất cả các cách mà khách hàng có thể **diễn đạt ý định mua hàng (user intent expression)** — cụ thể là đặt mua áo thun của một ban nhạc.
+
+Nói cách khác, hệ thống sẽ giúp bạn khám phá các biến thể như:
+- “Tôi muốn mua áo band này”
+- “Có áo của nhóm X không?”
+- “Cho mình đặt một cái áo tour của band Y”
+- …
+
+Việc bao phủ đầy đủ các cách diễn đạt này giúp chatbot:
+
+- **hiểu intent chính xác hơn (intent recognition)**
+- cải thiện **trải nghiệm người dùng (UX)**
+- và tăng **tỷ lệ chuyển đổi (conversion rate)**
+
+
+1. Viết câu lệnh (prompt) sẽ tạo ra các biến thể đầu ra. Trong ví dụ này, tôi sử dụng gemini-pro để tạo 10 hướng dẫn. Xem Bảng 15:
+
+
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">We have a band merchandise t-shirt webshop, and to train a  chatbot we need various ways to order: "One Metallica t-shirt  size S". Generate 10 variants, with the same semantics but keep  the same meaning. </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">1. I’d like to purchase a Metallica t-shirt in size small.  2. Can I order a small-sized Metallica t-shirt?  3. I’d like to buy one Metallica t-shirt in small.  4. One Metallica shirt, size small, please.  5. I want one Metallica t-shirt in size small.  6. I’d like to place an order for one Metallica t-shirt in small.  7. Small Metallica t-shirt, one please.  8. I’m looking for one Metallica t-shirt in small.  9. Can you get me one Metallica t-shirt in small?  10.One Metallica small t-shirt, please. </td>
+</tr>
+</table>
+
+
+2. Đánh giá (evaluate) tất cả các _instruction candidates_ (các phương án câu lệnh/đề bài) bằng cách chấm điểm dựa trên một _metric_ (thước đo) đã chọn. Ví dụ, bạn có thể sử dụng các chỉ số như **BLEU (Bilingual Evaluation Understudy)** hoặc **ROUGE (Recall-Oriented Understudy for Gisting Evaluation)** để đo mức độ tương đồng và chất lượng giữa các đầu ra.
+3. Lựa chọn _instruction candidate_ có _evaluation score_ (điểm đánh giá) cao nhất. Đây sẽ là _final prompt_ (câu lệnh đầu vào cuối cùng) mà bạn có thể sử dụng trong ứng dụng phần mềm hoặc chatbot của mình. Ngoài ra, bạn cũng có thể _fine-tune_ (tinh chỉnh) lại prompt đã chọn và thực hiện đánh giá lại để tối ưu hiệu suất.
+
+### Code prompting 
+
