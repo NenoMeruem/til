@@ -924,3 +924,149 @@ Việc bao phủ đầy đủ các cách diễn đạt này giúp chatbot:
 
 ### Code prompting 
 
+Gemini chủ yếu tập trung vào các câu lệnh đầu vào dựa trên văn bản, bao gồm cả các câu lệnh viết để trả về mã nguồn. Hãy vào Vertex AI Studio và thử nghiệm các câu lệnh này để xem một số ví dụ về lập trình.
+
+#### Prompts for writing code
+
+Gemini cũng có thể đóng vai trò như một **developer assistant**, hỗ trợ bạn **viết code** bằng bất kỳ ngôn ngữ lập trình nào. Với lập trình viên, điều này giúp **tăng tốc workflow**, giảm thời gian xử lý các tác vụ lặp lại và nâng cao hiệu suất phát triển phần mềm.
+
+Ví dụ, hãy tưởng tượng trên máy tính của bạn có một thư mục chứa **hàng trăm file cần đổi tên**. Nếu rename thủ công từng file, bạn sẽ mất rất nhiều thời gian.
+
+Bạn có biết một chút về **Bash** và hoàn toàn có thể tự viết một script để **tự động hóa (automation)** việc này, nhưng việc thiết kế script, debug và test cũng có thể tốn kha khá thời gian.
+
+Thay vào đó, bạn chỉ cần viết một **prompt** mô tả yêu cầu.
+
+Bạn có thể nhập prompt này trực tiếp trên chatbot công khai **Gemini**. Hoặc nếu bạn quan tâm nhiều hơn đến vấn đề **bảo mật dữ liệu** và **confidentiality**, bạn có thể sử dụng prompt ngay trong tài khoản **Google Cloud** của mình thông qua **Vertex AI Studio**.
+
+Ưu điểm của **Vertex AI Studio** là bạn có thể tùy chỉnh nhiều tham số của mô hình, chẳng hạn như:
+
+- **Temperature**: điều chỉnh mức độ sáng tạo/ngẫu nhiên của output
+- **Model settings**: cấu hình hành vi của AI
+- **Inference parameters**: tối ưu kết quả sinh nội dung
+- **Privacy control**: quản lý dữ liệu nội bộ an toàn hơn
+
+Nói ngắn gọn, thay vì tự code từ đầu cho các tác vụ nhỏ hoặc lặp đi lặp lại, bạn có thể tận dụng Gemini như một **AI pair programmer** để tăng tốc quá trình phát triển phần mềm.
+
+Đoạn mã đó có vẻ tốt với tôi — thậm chí còn có tài liệu hướng dẫn nữa! Tuy nhiên, vì các mô hình ngôn ngữ lớn (LLM) không thể suy luận thực sự mà chỉ lặp lại dữ liệu đã được huấn luyện, nên việc đọc và kiểm thử mã trước là điều rất quan trọng. Giây phút mà tất cả chúng ta đang chờ đợi: liệu nó có thực sự hoạt động không?
+
+
+<table>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Write a prompt to write code in Bash to rename files in a folder.</td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >0.1</td>
+    <th >Token Limit</th>
+    <td >1024</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>N/A</td>
+      <th>Top P</th>
+     <td>1</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Write a code snippet in Bash, which asks for a folder name.  Then it takes the contents of the folder and renames all the  files inside by prepending the name draft to the file name. </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">```bash  #!/bin/bash  
+    #Ask for the folder name  echo "Enter the folder name: "  read folder_name  #Check if the folder exists  if [! -d "$folder_name"]; then  echo "Folder does not exist."  exit 1  fi  #Get the list of files in the folder  files=( "$folder_name"/*)  #Rename each file by prepending "draft" to the file name  for file in "${files[@]}"; do  new_file_name="draft_$(basename "$file")"  mv "$file" "$new_file_name"  done  echo "Files renamed successfully."  ```  </td>
+</tr>
+</table>
+
+
+Hãy thử trước với một thư mục thử nghiệm chỉ có vài tệp bên trong, những tệp này cần được đổi tên từ filename.txt thành draft_filename.txt.
+
+1. Sao chép nội dung từ Bảng 16 (không bao gồm các ký tự bao quanh ```bash ```) và dán vào một tệp mới có tên là: “rename_files.sh”.
+2. Mở cửa sổ terminal và gõ: `. rename_files.sh`. Hệ thống sẽ yêu cầu nhập tên thư mục, ví dụ: `test`, sau đó nhấn Enter.
+3. Kịch bản có vẻ chạy ổn. Bạn sẽ thấy thông báo: `Files renamed successfully`.
+
+Khi kiểm tra thư mục test, bạn sẽ thấy tất cả các tệp đã được đổi tên chính xác thành draft_filename.txt. Nó đã hoạt động thành công!
+
+
+### Prompts for explaining code 
+
+Là một lập trình viên, khi làm việc theo nhóm, bạn thường phải đọc mã nguồn của người khác. Gemini cũng có thể giúp bạn thực hiện việc này. Hãy lấy đoạn mã từ Bảng 16, xóa các chú thích và yêu cầu mô hình ngôn ngữ lớn giải thích điều gì đang diễn ra; xem Bảng 17:
+
+
+<table>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Write a prompt to explain Bash code.</td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >0.1</td>
+    <th >Token Limit</th>
+    <td >1024</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>N/A</td>
+      <th>Top P</th>
+     <td>1</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Explain to me the below Bash code:  ```  #!/bin/bash  echo "Enter the folder name: "  read folder_name  if [! -d "$folder_name"]; then  echo "Folder does not exist."  exit 1  fi  files=( "$folder_name"/*)  for file in "${files[@]}"; do  new_file_name="draft_$(basename "$file")"  mv "$file" "$new_file_name"  done  echo "Files renamed successfully."  ```  </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">This Bash script performs the following tasks:  1. **User Input**:  - It prompts the user to enter a folder name using the `echo` and `read`  commands. The entered folder name is stored in the `folder_name` variable.  2. **Folder Existence Check**:  - It checks if the folder with the specified name exists using the `[! -d  “$folder_name” ]` condition. If the folder does not exist, it displays an error  message (“Folder does not exist.”) and exits the script with an exit code of 1. 
+    3. **File Listing**:  - It lists all the files inside the specified folder using the `files=( “$folder_  name”/* )` command. This creates an array called `files` containing the paths  to all the files in the folder.  4. **File Renaming**:  - It iterates through each file in the `files` array using a `for` loop.  - For each file, it generates a new file name using the `new_file_  name=”draft_$(basename “$file”)” ` command. This new file name is created  by prefixing the original file name with the string “draft_”.  - It then renames the file using the `mv “$file” “$new_file_name”` command,  which moves the file to the new file name.  5. **Success Message**:  - After renaming all the files, it displays a success message (“Files renamed  successfully.”) to indicate that the renaming operation was successful  </td>
+</tr>
+</table>
+
+
+
+### Prompts for translating code 
+
+Mã Bash ở Bảng 16 có vẻ hoạt động tốt. Tuy nhiên, tập lệnh này sẽ thực sự có khả năng tái sử dụng nếu nó yêu cầu tôi nhập tên tệp; lý tưởng nhất là nó nên hoạt động như một ứng dụng riêng biệt có giao diện người dùng (UI). Để bắt đầu, Python sẽ là ngôn ngữ tốt hơn Bash cho một ứng dụng (web). Các LLM có thể giúp chuyển đổi mã từ ngôn ngữ này sang ngôn ngữ khác. Hãy xem ví dụ ở Bảng 18:
+
+
+<table>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Write a prompt to translate Bash code to Python .</td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >0.1</td>
+    <th >Token Limit</th>
+    <td >1024</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>N/A</td>
+      <th>Top P</th>
+     <td>1</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">Translate the below Bash code to a Python snippet.  ```bash  #!/bin/bash  echo "Enter the folder name: "  read folder_name  if [! -d "$folder_name"]; then  echo "Folder does not exist."  exit 1  fi  files=( "$folder_name"/*)  for file in "${files[@]}"; do  new_file_name="draft_$(basename "$file")"  mv "$file" "$new_file_name"  done  echo "Files renamed successfully."  ```   </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">```python  import os  import shutil  #Get the folder name from the user  folder_name = input("Enter the folder name:")  #Check if the folder exists  if not os.path.isdir(folder_name):  print("Folder does not exist.")  exit(1)  
+    #Get a list of all files in the folder  files = os.listdir(folder_name)  #Iterate over the files  for file in files:  #Create a new file name with the prefix "draft_"  new_file_name = f"draft_{file}"  #Move the file to the new name  shutil.move(os.path.join(folder_name, file),  os.path.join(folder_name, new_file_name))  #Print a success message  print("Files renamed successfully.")  ``` 
+</td>
+</tr>
+</table>
+
+
