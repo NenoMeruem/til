@@ -1036,10 +1036,11 @@ Là một lập trình viên, khi làm việc theo nhóm, bạn thường phải
 Mã Bash ở Bảng 16 có vẻ hoạt động tốt. Tuy nhiên, tập lệnh này sẽ thực sự có khả năng tái sử dụng nếu nó yêu cầu tôi nhập tên tệp; lý tưởng nhất là nó nên hoạt động như một ứng dụng riêng biệt có giao diện người dùng (UI). Để bắt đầu, Python sẽ là ngôn ngữ tốt hơn Bash cho một ứng dụng (web). Các LLM có thể giúp chuyển đổi mã từ ngôn ngữ này sang ngôn ngữ khác. Hãy xem ví dụ ở Bảng 18:
 
 
+
 <table>
   <tr>
     <th>Goal</th>
-    <td colspan="3">Write a prompt to translate Bash code to Python .</td>
+    <td colspan="3">Write a prompt to translate Bash code to Python </td>
   </tr>
   <tr>
 	<th>Model</th>
@@ -1063,10 +1064,289 @@ Mã Bash ở Bảng 16 có vẻ hoạt động tốt. Tuy nhiên, tập lệnh n
   </tr>
   <tr>
     <th>Output</th>
-    <td colspan="3">```python  import os  import shutil  #Get the folder name from the user  folder_name = input("Enter the folder name:")  #Check if the folder exists  if not os.path.isdir(folder_name):  print("Folder does not exist.")  exit(1)  
+    <td colspan="3">```python  import os  import shutil  #Get the folder name from the user  folder_name = input("Enter the folder name:")  #Check if the folder exists  if not os.path.isdir(folder_name):  print("Folder does not exist.")  exit(1) 
     #Get a list of all files in the folder  files = os.listdir(folder_name)  #Iterate over the files  for file in files:  #Create a new file name with the prefix "draft_"  new_file_name = f"draft_{file}"  #Move the file to the new name  shutil.move(os.path.join(folder_name, file),  os.path.join(folder_name, new_file_name))  #Print a success message  print("Files renamed successfully.")  ``` 
-</td>
+     </td>
 </tr>
 </table>
 
 
+
+Hãy đọc và xem lại mã nguồn. Sao chép kết quả đầu ra từ cửa sổ lệnh và dán vào một tệp mới có tên là: `file_renamer.py`. Kiểm tra mã bằng cách mở cửa sổ Terminal và thực hiện lệnh sau: `python file_renamer.py`.
+
+**LƯU Ý:** Khi yêu cầu mã (Python) trong Language Studio ở Vertex AI, bạn sẽ phải nhấp vào nút ‘Markdown’. Nếu không, bạn sẽ nhận được văn bản thuần túy bị thiếu các khoảng thụt đầu dòng chính xác, điều vốn rất quan trọng để chạy mã Python.
+
+### Prompts for debugging and reviewing code 
+
+
+Hãy cùng tự tay chỉnh sửa mã nguồn của Bảng 18. Nó sẽ yêu cầu người dùng nhập tiền tố tên tệp (filename prefix) và ghi lại tiền tố này dưới dạng chữ in hoa. Hãy xem mã ví dụ trong Snippet *3, nhưng thật đáng tiếc, giờ nó lại báo lỗi Python!
+
+
+```python
+
+
+Python  import os  import shutil  
+
+folder_name = input("Enter the folder name:")  
+prefix = input("Enter the string to prepend to the filename:")  
+text = toUpperCase(prefix)  
+if not os.path.isdir(folder_name):  
+	print("Folder does not exist.")  
+	exit(1)  
+	
+files = os.listdir(folder_name)  
+for file in files:  
+	new_filename = f"{text}_{file}"  
+	
+shutil.move(os.path.join(folder_name, file),  os.path.joi(folder_name, new_file_name))  
+
+print("Files renamed successfully.")
+```
+
+
+
+
+Doh! That looks like a bug: 
+```
+The below Python code gives an error:  Traceback (most recent call last):  File “/Users/leeboonstra/Documents/test_folder/rename_files.py”, line 7,  in <module>  text = toUpperCase(prefix)  NameError: name ‘toUpperCase’ is not defined
+```
+
+
+ Để xem liệu chúng ta có thể nhờ mô hình ngôn ngữ lớn debug và review code được không nhé. Hãy tham khảo Bảng 19:
+
+
+<table>
+  <tr>
+    <th>Goal</th>
+    <td colspan="3">Write a prompt to debug and review Python code.</td>
+  </tr>
+  <tr>
+	<th>Model</th>
+	 <td colspan="3">gemini-pro</td>
+  </tr>
+  <tr>
+     <th>Temperature</th>
+    <td >0.1</td>
+    <th >Token Limit</th>
+    <td >1024</td>
+  </tr>
+  <tr>
+	  <th>Top K</th>
+     <td>N/A</td>
+      <th>Top P</th>
+     <td>1</td>
+  </tr>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">The below Python code gives an error:  Traceback (most recent call last):  File"/  Users/leeboonstra/Documents/test_folder/rename_files.py", line  7, in <module>  text = toUpperCase(prefix)  NameError: name 'toUpperCase' is not defined  Debug what's wrong and explain how I can improve the code.  ```python  import os  import shutil  #Get the folder name from the user  folder_name = input("Enter the folder name:")  prefix = input("Enter the string to prepend to the filename:")  text = toUpperCase(prefix)  #Check if the folder exists  if not os.path.isdir(folder_name):  print("Folder does not exist.")  exit(1)  #Get a list of all files in the folder  files = os.listdir(folder_name)  #Iterate over the files  for file in files:  #Create a new file name with the prefix "draft_"  new_filename = f"{text}_{file}"  #Move the file to the new name  shutil.move(os.path.join(folder_name, file),  os.path.join(folder_name, new_file_name))  #Print a success message  print("Files renamed successfully.") </td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">The code calls the `toUpperCase` function to convert `prefix` to uppercase, but  that function is not defined. To fix this issue, you can use the `upper()` method of  the string class which converts a given string into uppercase. The modified code  is shown below:  ```python  import os  import shutil  #Get the folder name from the user  folder_name = input("Enter the folder name:")  prefix = input("Enter the string to prepend to the filename:")  text = prefix.upper()  #Check if the folder exists  if not os.path.isdir(folder_name):  print("Folder does not exist.")  exit(1)  #Get a list of all files in the folder  files = os.listdir(folder_name)  #Iterate over the files  for file in files:  #Create a new file name with the prefix "draft_"  new_filename = f"{text}_{file}"  #Move the file to the new name  shutil.move(os.path.join(folder_name, file), os.path.join(folder_name, new_filename))  #Print a success message  print("Files renamed successfully.")  ```  Additionally, there are a few other improvements that can be made to the code:  1. The file extension of the new filenames is not kept. It’s better to extract the  extension from the original filename and append it to the new filename.  2. The code assumes that there are no spaces in the folder name. However,  it is a good practice to handle spaces gracefully by replacing them with  underscores or hyphens.  3. Using the `f` string syntax for string interpolation is more readable and  concise than the traditional `+` operator.  4. The code doesn’t handle errors that might occur during the renaming process.  It would be better to wrap the `shutil.move` call in a `try...except` block to  catch any potential errors.  Here is the improved code with these suggestions:  ```python  import os  import shutil  #Get the folder name from the user  folder_name = input("Enter the folder name:")  prefix = input("Enter the string to prepend to the filename:")  #Check if the folder exists  if not os.path.isdir(folder_name):  print("Folder does not exist.")  exit(1)  #Get a list of all files in the folder  files = os.listdir(folder_name)  #Iterate over the files  for file in files: #Get the file extension  ext = os.path.splitext(file)[1]  #Create a new file name with the prefix and the file extension  new_filename = f"{prefix}_{os.path.splitext(file)[0]}{ext}"  #Build the full paths for the original and new files  old_path = os.path.join(folder_name, file)  new_path = os.path.join(folder_name, new_filename)  #Try to move the file  try:  shutil.move(old_path, new_path)  except Exception as e:  print(f"An error occurred while moving the file  {file}: {e}")  #Print a success message  print("Files renamed successfully.")  ```  These improvements make the code more robust and flexible while also making  it easier to read and understand... (The response was truncated because  it has reached the token limit. Try to increase the token limit if you need a  longer response.)  </td>
+</tr>
+</table>
+
+
+Thật tuyệt vời. Không chỉ chỉ cho tôi cách giải quyết vấn đề, nó còn phát hiện ra mã (code) của tôi có thêm các lỗi khác và hướng dẫn cách sửa chúng nữa. Phần cuối của câu lệnh (prompt) còn đưa ra những gợi ý để cải thiện mã nguồn nói chung.
+
+##### Thế còn việc **đưa ra câu lệnh đa phương thức** thì sao?
+
+Việc tạo câu lệnh (prompt) cho mã nguồn vẫn sử dụng cùng một mô hình ngôn ngữ lớn thông thường. Trong khi đó, prompt đa phương thức (multimodal prompting) là một khái niệm riêng biệt; nó đề cập đến kỹ thuật sử dụng nhiều định dạng đầu vào khác nhau để dẫn dắt một mô hình ngôn ngữ lớn, thay vì chỉ dựa vào văn bản thuần túy. Điều này có thể bao gồm sự kết hợp giữa văn bản, hình ảnh, âm thanh, mã nguồn hoặc thậm chí là các định dạng khác, tùy thuộc vào khả năng của mô hình và nhiệm vụ cụ thể.
+
+## Best Practices 
+
+Để tìm được một prompt (câu lệnh) phù hợp, bạn cần phải mày mò và tinh chỉnh thường xuyên. Language Studio trong Vertex AI là môi trường lý tưởng để bạn thử nghiệm các prompt của mình nhờ khả năng kiểm tra trên nhiều mô hình khác nhau. Hãy áp dụng những phương pháp hay nhất (best practices) sau đây để trở thành một chuyên gia về prompt engineering.
+
+### Provide examples 
+
+Quy tắc quan trọng nhất là cung cấp các ví dụ (one-shot/few-shot) bên trong câu lệnh (prompt). Phương pháp này cực kỳ hiệu quả vì nó đóng vai trò như một công cụ giảng dạy mạnh mẽ. Những ví dụ này minh họa các kết quả đầu ra mong muốn hoặc các phản hồi tương tự, cho phép mô hình học hỏi từ chúng và điều chỉnh việc tạo nội dung sao cho phù hợp. Việc này giống như đưa cho mô hình một điểm tham chiếu hoặc mục tiêu để hướng tới, từ đó cải thiện độ chính xác, phong cách và giọng điệu của phản hồi để đáp ứng tốt hơn mong đợi của bạn.
+
+### Design with simplicity 
+
+
+Các câu lệnh nên ngắn gọn, rõ ràng và dễ hiểu đối với cả bạn lẫn mô hình. Theo quy tắc chung, nếu chính bạn còn thấy khó hiểu thì khả năng cao là mô hình cũng sẽ thấy khó hiểu. Hãy cố gắng không sử dụng ngôn ngữ phức tạp và đừng đưa vào những thông tin không cần thiết.
+
+
+Dưới đây là bản dịch bài viết theo phong cách **Prompt Engineering** (Kỹ thuật đặt câu lệnh), sử dụng các thuật ngữ chuyên ngành lập trình để giúp bạn tối ưu hóa đầu vào (input) cho AI:
+
+#### Ví dụ minh họa:
+
+**TRƯỚC KHI TỐI ƯU (Raw Input):**
+> "Tôi đang đi du lịch ở New York và muốn biết thêm về các địa điểm thú vị. Tôi đi cùng hai đứa trẻ 3 tuổi. Chúng tôi nên đi đâu trong kỳ nghỉ này?"
+
+**SAU KHI REFACTOR (Structured Prompt):**
+> "**Act as** (Đóng vai) một hướng dẫn viên du lịch chuyên nghiệp. **Describe** (Mô tả) các địa điểm tham quan lý tưởng tại khu vực Manhattan, New York dành cho đối tượng khách du lịch có trẻ em 3 tuổi đi cùng."
+
+### Sử dụng các "Action Verbs" làm hàm thực thi
+
+Để AI hiểu rõ **Logic** và **Task** (nhiệm vụ) cần xử lý, hãy sử dụng các động từ mạnh đóng vai trò như các hàm chức năng. Dưới đây là danh sách các từ khóa giúp bạn điều khiển AI hiệu quả hơn:
+
+*   **Act:** Đóng vai (Thiết lập Context/Role cho AI).
+*   **Analyze:** Phân tích (Bóc tách dữ liệu).
+*   **Categorize / Classify:** Phân loại (Sắp xếp dữ liệu vào các nhóm/mảng).
+*   **Compare / Contrast:** So sánh / Đối chiếu (Tìm điểm tương đồng và khác biệt).
+*   **Create / Generate:** Khởi tạo / Sinh nội dung (Tạo mới object, văn bản, mã nguồn).
+*   **Describe:** Mô tả (Cung cấp chi tiết thuộc tính).
+*   **Define:** Định nghĩa (Xác định khái niệm).
+*   **Evaluate:** Đánh giá (Kiểm tra chất lượng dựa trên tiêu chí).
+*   **Extract / Parse:** Trích xuất / Phân tích cú pháp (Lấy dữ liệu cụ thể từ một nguồn thô).
+*   **Find / Identify:** Tìm kiếm / Nhận diện (Xác định các phần tử trong tập dữ liệu).
+*   **List:** Liệt kê (Trả về danh sách/array).
+*   **Measure:** Đo lường (Định lượng các thông số).
+*   **Organize / Sort:** Tổ chức / Sắp xếp (Thay đổi cấu trúc thứ tự của dữ liệu).
+*   **Pick / Select:** Chọn lọc (Lọc ra các phần tử phù hợp).
+*   **Predict:** Dự đoán (Dựa trên pattern có sẵn).
+*   **Provide / Return:** Cung cấp / Trả về (Xác định định dạng kết quả đầu ra).
+*   **Recommend:** Đề xuất (Gợi ý dựa trên tham số đầu vào).
+*   **Retrieve:** Truy xuất (Lấy thông tin từ database/kiến thức đã học).
+*   **Rewrite:** Viết lại (Refactor lại văn bản/code).
+*   **Summarize:** Tóm tắt (Nén dữ liệu nhưng vẫn giữ nguyên giá trị cốt lõi).
+*   **Translate:** Dịch (Chuyển đổi ngôn ngữ hoặc định dạng dữ liệu).
+*   **Write:** Viết (Thực thi việc soạn thảo nội dung).
+
+**Lời khuyên:** Khi viết Prompt, hãy coi mỗi động từ trên là một **Function Call** . Càng xác định rõ hàm và tham số (như địa điểm, độ tuổi, mục đích), kết quả trả về sẽ càng ít **Bug** và có độ chính xác cao hơn.
+
+### Be specific about the output 
+
+Hãy cụ thể về kết quả đầu ra mong muốn. Một chỉ dẫn quá ngắn gọn có thể không đủ để định hướng cho LLM (Mô hình ngôn ngữ lớn) hoặc có thể quá chung chung. Việc cung cấp các chi tiết cụ thể trong câu lệnh (thông qua prompt hệ thống hoặc prompt ngữ cảnh) có thể giúp mô hình tập trung vào những nội dung liên quan, từ đó cải thiện độ chính xác tổng thể.
+
+**Ví dụ:**
+*   **NÊN LÀM:** Hãy viết một bài blog dài 3 đoạn về top 5 máy chơi game console hàng đầu. Bài viết cần mang tính cung cấp thông tin, lôi cuốn và được viết theo phong cách trò chuyện thân mật.
+*   **KHÔNG NÊN LÀM:** Hãy viết một bài blog về các máy chơi game console.
+
+### Use Instructions over Constraints 
+
+Chỉ dẫn (instructions) và ràng buộc (constraints) được sử dụng trong kỹ thuật nhắc (prompting) để điều hướng đầu ra của một mô hình ngôn ngữ lớn (LLM).
+
+*   **Chỉ dẫn** cung cấp các hướng dẫn rõ ràng về định dạng, phong cách hoặc nội dung mong muốn của câu trả lời. Nó dẫn dắt mô hình về những gì mô hình nên làm hoặc tạo ra.
+*   **Ràng buộc** là một tập hợp các giới hạn hoặc ranh giới cho câu trả lời. Nó giới hạn những gì mô hình không được làm hoặc cần phải tránh.
+
+
+Ngày càng có nhiều nghiên cứu cho thấy việc tập trung vào các chỉ dẫn mang tính khẳng định (positive instructions) khi viết câu lệnh (prompting) có thể mang lại hiệu quả cao hơn so với việc phụ thuộc quá nhiều vào các ràng buộc. Cách tiếp cận này tương đồng với việc con người thường thích nhận những chỉ dẫn về việc cần làm hơn là một danh sách những điều không được làm.
+
+Các chỉ dẫn sẽ truyền đạt trực tiếp kết quả mong muốn, trong khi các ràng buộc có thể khiến mô hình phải tự suy đoán xem điều gì là được phép. Nó mang lại sự linh hoạt và khuyến khích khả năng sáng tạo trong các ranh giới đã xác định, trong khi các ràng buộc có thể làm hạn chế tiềm năng của mô hình. Ngoài ra, một danh sách các ràng buộc cũng có thể xung đột lẫn nhau.
+
+Tuy nhiên, các ràng buộc vẫn có giá trị trong những tình huống nhất định, chẳng hạn như để ngăn chặn mô hình tạo ra các nội dung độc hại, thiên kiến, hoặc khi cần một định dạng đầu ra và phong cách nghiêm ngặt. Nếu có thể, hãy sử dụng các chỉ dẫn khẳng định: thay vì bảo mô hình không được làm gì, hãy bảo nó nên làm gì thay vào đó. Điều này có thể giúp tránh gây nhầm lẫn và cải thiện độ chính xác của kết quả đầu ra.
+
+**NÊN:** Viết một bài đăng blog dài 1 đoạn văn về top 5 máy chơi game console hàng đầu. Chỉ thảo luận về tên máy, công ty sản xuất, năm ra mắt và tổng doanh số.
+
+**KHÔNG NÊN:** Viết một bài đăng blog dài 1 đoạn văn về top 5 máy chơi game console hàng đầu. Không liệt kê tên các trò chơi điện tử.
+
+Theo kinh nghiệm thực hành tốt nhất, hãy bắt đầu bằng cách ưu tiên các chỉ dẫn, nêu rõ những gì bạn muốn mô hình thực hiện và chỉ sử dụng các ràng buộc khi thực sự cần thiết vì lý do an toàn, sự rõ ràng hoặc các yêu cầu cụ thể. Hãy thử nghiệm và lặp lại để kiểm tra các cách kết hợp chỉ dẫn và ràng buộc khác nhau nhằm tìm ra phương án hiệu quả nhất cho các tác vụ cụ thể của bạn, đồng thời ghi chép lại các kết quả đó.
+
+### Control the max token length 
+
+Để kiểm soát độ dài phản hồi của LLM, bạn có thể thiết lập giới hạn token tối đa trong phần cấu hình hoặc yêu cầu cụ thể một độ dài nhất định ngay trong câu lệnh (prompt). 
+Ví dụ: 'Hãy giải thích vật lý lượng tử với độ dài của một bài đăng trên Twitter (tweet)
+
+### Use variables in prompts 
+
+Để tái sử dụng các câu lệnh (prompt) và làm cho chúng trở nên linh hoạt hơn, hãy sử dụng các biến số ngay trong câu lệnh để có thể thay đổi tùy theo các đầu vào khác nhau. Ví dụ, như được trình bày trong Bảng 20 về một câu lệnh cung cấp thông tin về một thành phố: thay vì viết cố định (hardcode) tên thành phố vào câu lệnh, hãy sử dụng một biến. Các biến sẽ giúp bạn tiết kiệm thời gian và công sức bằng cách tránh việc phải lặp đi lặp lại cùng một nội dung. Nếu bạn cần sử dụng cùng một mẩu thông tin cho nhiều câu lệnh khác nhau, bạn có thể lưu trữ nó vào một biến và sau đó tham chiếu đến biến đó trong từng câu lệnh. Điều này đặc biệt hữu ích khi bạn tích hợp các câu lệnh vào các ứng dụng của riêng mình.
+
+<table>
+  <tr>
+	  <th>Prompt</th>
+      <td colspan="3">VARIABLES  {city} = "Amsterdam"  
+      PROMPT  You are a travel guide. Tell me a fact about the city: {city} 
+</td>
+  </tr>
+  <tr>
+    <th>Output</th>
+    <td colspan="3">Amsterdam is a beautiful city full of canals, bridges, and narrow streets. It’s a  great place to visit for its rich history, culture, and nightlife.  </td>
+</tr>
+</table>
+
+
+### Experiment with input formats and writing styles 
+
+
+Các mô hình, cấu hình mô hình, định dạng câu lệnh (prompt), cách lựa chọn từ ngữ và các lượt gửi khác nhau có thể tạo ra những kết quả khác nhau. Do đó, việc thử nghiệm với các thuộc tính của câu lệnh như phong cách, cách chọn từ và loại câu lệnh (như zero-shot, few-shot, hoặc câu lệnh hệ thống - system prompt) là rất quan trọng.
+
+Ví dụ, với mục tiêu tạo nội dung về hệ máy chơi game mang tính cách mạng Sega Dreamcast, một câu lệnh có thể được diễn đạt dưới dạng một câu hỏi, một câu khẳng định hoặc một chỉ dẫn, dẫn đến các kết quả đầu ra khác nhau:
+
+*   **Câu hỏi:** Sega Dreamcast là gì và tại sao nó lại là một hệ máy chơi game mang tính cách mạng như vậy?
+*   **Câu khẳng định:** Sega Dreamcast là hệ máy chơi game thế hệ thứ sáu được Sega phát hành vào năm 1999. Nó...
+*   **Chỉ dẫn:** Hãy viết một đoạn văn mô tả về hệ máy Sega Dreamcast và giải thích tại sao nó lại mang tính cách mạng đến thế.
+
+### For few-shot prompting with classification tasks, mix up  the classes 
+
+
+Nói chung, thứ tự của các ví dụ few-shot thường không quá quan trọng. Tuy nhiên, khi thực hiện các tác vụ phân loại (classification), hãy đảm bảo rằng bạn xáo trộn các lớp phản hồi (response classes) trong các ví dụ đó. Điều này là do nếu không làm vậy, bạn có thể gặp tình trạng quá khớp (overfitting) vào một thứ tự cụ thể của các ví dụ. Bằng cách xáo trộn các lớp phản hồi, bạn có thể đảm bảo mô hình đang học cách nhận diện các đặc điểm cốt lõi của từng lớp, thay vì chỉ đơn thuần ghi nhớ thứ tự của các ví dụ. Điều này sẽ dẫn đến hiệu suất ổn định và khả năng tổng quát hóa tốt hơn trên những dữ liệu mới.
+
+**Giải thích một số thuật ngữ trong đoạn:**
+*   **Few-shot examples:** Các ví dụ minh họa kèm theo trong câu lệnh (prompt) để mô hình học theo.
+*   **Classification tasks:** Các tác vụ phân loại (ví dụ: phân loại email là rác hay không rác, phân loại cảm xúc tích cực hay tiêu cực).
+*   **Overfitting (Quá khớp):** Hiện tượng mô hình học thuộc lòng dữ liệu huấn luyện (hoặc thứ tự ví dụ) thay vì học quy luật chung, dẫn đến kết quả sai khi gặp dữ liệu mới.
+*   **Robust:** Hoạt động ổn định/mạnh mẽ.
+*   **Generalizable:** Khả năng tổng quát hóa (áp dụng tốt cho các trường hợp mới chưa từng gặp).
+
+Một nguyên tắc chung là hãy bắt đầu với 6 few-shot và bắt đầu kiểm tra độ chính xác từ đó.
+
+### Adapt to model updates 
+
+Việc cập nhật thường xuyên các thay đổi về kiến trúc mô hình, dữ liệu bổ sung và các năng lực mới là rất quan trọng. Hãy thử nghiệm các phiên bản mô hình mới hơn và điều chỉnh câu lệnh (prompt) để tận dụng tốt hơn các tính năng mới của mô hình. Các công cụ như Vertex AI Studio rất hữu ích để lưu trữ, thử nghiệm và ghi chép lại các phiên bản prompt khác nhau của bạn.
+
+### Experiment with output formats 
+
+Bên cạnh định dạng đầu vào của prompt, hãy cân nhắc thử nghiệm với cả định dạng đầu ra. Đối với các tác vụ ít tính sáng tạo như trích xuất, lựa chọn, phân tích cú pháp, sắp xếp, xếp hạng hoặc phân loại dữ liệu, hãy thử yêu cầu kết quả trả về dưới định dạng có cấu trúc như JSON hoặc XML. Việc trả về các đối tượng JSON từ một prompt trích xuất dữ liệu mang lại một số lợi ích nhất định. Trong một ứng dụng thực tế, tôi không cần phải tạo định dạng JSON này một cách thủ công, đồng thời có thể nhận dữ liệu đã được sắp xếp sẵn (rất tiện lợi khi làm việc với các đối tượng ngày giờ). Nhưng quan trọng nhất là việc yêu cầu định dạng JSON sẽ buộc mô hình phải tuân theo một cấu trúc nhất định và giúp hạn chế hiện tượng 'ảo tưởng' (hallucinations).
+
+**Tóm lại, những lợi ích của việc sử dụng JSON cho kết quả đầu ra bao gồm:**
+*   **Kết quả luôn nhất quán về định dạng:** Dữ liệu trả về luôn tuân theo một cấu trúc thống nhất.
+*   **Tập trung vào đúng dữ liệu cần thiết:** Giúp bạn chỉ nhận được những thông tin quan trọng mà mình mong muốn.
+*   **Giảm thiểu khả năng xảy ra "ảo giác":** (Trong ngữ cảnh AI) Giúp hạn chế việc mô hình tạo ra các thông tin sai lệch hoặc không liên quan.
+*   **Thể hiện rõ các mối quan hệ:** Giúp cấu trúc dữ liệu nhận biết được mối liên hệ giữa các thành phần với nhau.
+*   **Xác định rõ các kiểu dữ liệu:** Bạn sẽ nhận được dữ liệu với các kiểu cụ thể (như số, chuỗi, boolean...).
+*   **Có thể sắp xếp được:** Dữ liệu có thể được sắp xếp theo thứ tự một cách dễ dàng.
+
+### JSON Repair 
+
+Mặc dù việc trả về dữ liệu dưới định dạng JSON mang lại nhiều lợi thế, nhưng nó cũng có những nhược điểm nhất định. Bản chất có cấu trúc của JSON, tuy hữu ích cho việc phân tích cú pháp và sử dụng trong các ứng dụng, lại đòi hỏi nhiều token hơn đáng kể so với văn bản thuần túy (plain text), dẫn đến thời gian xử lý lâu hơn và chi phí cao hơn. Thêm vào đó, tính dài dòng của JSON có thể dễ dàng chiếm hết cửa sổ đầu ra, trở thành một vấn đề đặc biệt nghiêm trọng khi quá trình tạo nội dung bị ngắt quãng đột ngột do giới hạn token. Việc bị cắt ngắn này thường dẫn đến kết quả JSON không hợp lệ vì thiếu các dấu đóng ngoặc nhọn hoặc ngoặc vuông quan trọng, khiến dữ liệu đầu ra không thể sử dụng được. May mắn thay, các công cụ như thư viện `json-repair` (có sẵn trên PyPI) có thể vô cùng hữu ích trong những tình huống này. Thư viện này sẽ nỗ lực sửa lỗi các đối tượng JSON không hoàn chỉnh hoặc sai định dạng một cách thông minh và tự động, biến nó thành một đồng minh quan trọng khi làm việc với JSON do LLM tạo ra, đặc biệt là khi phải đối mặt với các vấn đề về việc bị cắt ngắn nội dung.
+
+### Working with Schemas 
+
+Sử dụng JSON có cấu trúc làm đầu ra là một giải pháp tuyệt vời, như chúng ta đã thấy nhiều lần trong bài viết này. Nhưng còn đầu vào thì sao? Trong khi JSON rất hiệu quả trong việc cấu trúc hóa kết quả đầu ra mà LLM tạo ra, nó cũng có thể cực kỳ hữu ích trong việc cấu trúc hóa dữ liệu đầu vào mà bạn cung cấp. Đây chính là lúc JSON Schema phát huy tác dụng. Một JSON Schema sẽ định nghĩa cấu trúc và kiểu dữ liệu dự kiến cho đầu vào JSON của bạn. Bằng cách cung cấp một schema, bạn đã đưa cho LLM một bản thiết kế rõ ràng về dữ liệu mà nó sẽ tiếp nhận, giúp nó tập trung sự chú ý vào các thông tin liên quan và giảm thiểu rủi ro hiểu sai đầu vào. Hơn nữa, các schema còn có thể giúp thiết lập mối quan hệ giữa các mẩu dữ liệu khác nhau, và thậm chí giúp LLM 'nhận thức được thời gian' bằng cách bao gồm các trường ngày tháng hoặc dấu thời gian (timestamp) với các định dạng cụ thể.
+
+Dưới đây là một ví dụ đơn giản: 
+
+Giả sử bạn muốn sử dụng LLM (mô hình ngôn ngữ lớn) để tạo mô tả cho các sản phẩm trong danh mục thương mại điện tử. Thay vì chỉ cung cấp một đoạn mô tả dưới dạng văn bản tự do, bạn có thể sử dụng JSON schema để định nghĩa các thuộc tính của sản phẩm:
+
+```json
+{  "type": "object",  "properties": {  "name": {"type": "string", "description": "Product name"},  "category": {"type": "string", "description": "Product category"},  "price": {"type": "number", "format": "float", "description": "Product  price"},  "features": {  "type": "array",  "items": {"type": "string"},  "description": "Key features of the product"  },  "release_date": {"type": "string", "format": "date", "description":  "Date the product was released"}  }, 
+```
+
+Sau đó, bạn có thể cung cấp dữ liệu sản phẩm thực tế dưới dạng một đối tượng JSON tuân thủ schema này.
+
+```json
+{  "name": "Wireless Headphones",  "category": "Electronics",  "price": 99.99,  "features": ["Noise cancellation", "Bluetooth 5.0", "20-hour battery life"],  "release_date": "2023-10-27"  } 
+```
+
+
+Bằng cách tiền xử lý dữ liệu và thay vì cung cấp toàn bộ tài liệu, bạn chỉ cung cấp cả lược đồ (schema) và dữ liệu, điều này giúp LLM hiểu rõ các thuộc tính của sản phẩm, bao gồm cả ngày phát hành. Cách làm này giúp tăng đáng kể khả năng tạo ra các mô tả chính xác và phù hợp. Phương pháp tiếp cận đầu vào có cấu trúc này, bằng cách hướng sự chú ý của LLM vào các trường thông tin liên quan, đặc biệt có giá trị khi làm việc với khối lượng dữ liệu lớn hoặc khi tích hợp LLM vào các ứng dụng phức tạp.
+
+### Experiment together with other prompt engineers 
+
+Nếu bạn đang ở trong tình huống phải cố gắng tạo ra một câu lệnh (prompt) hiệu quả, bạn nên nhờ nhiều người cùng thử sức. Khi tất cả mọi người đều tuân thủ các phương pháp tối ưu (được liệt kê trong chương này), bạn sẽ thấy sự khác biệt về hiệu quả giữa các câu lệnh mà mỗi người tạo ra.
+
+### CoT Best practices 
+
+Đối với kỹ thuật gợi ý suy luận chuỗi (CoT prompting), việc đặt đáp án sau phần lập luận là yêu cầu bắt buộc, vì quá trình tạo ra các bước lập luận sẽ làm thay đổi các token (từ ngữ) mà mô hình nhận được khi nó dự đoán đáp án cuối cùng. Khi kết hợp CoT với tính nhất quán tự thân (self-consistency), bạn cần có khả năng tách biệt đáp án cuối cùng ra khỏi phần lập luận trong câu lệnh của mình.
+
+Đối với CoT, hãy đặt thông số nhiệt độ (temperature) bằng 0. Kỹ thuật gợi ý chuỗi suy luận dựa trên giải mã tham lam (greedy decoding), tức là dự đoán từ tiếp theo trong một chuỗi dựa trên xác suất cao nhất được mô hình ngôn ngữ gán cho. 
+Nhìn chung, khi sử dụng suy luận để đưa ra đáp án cuối cùng, thường chỉ có một đáp án đúng duy nhất. Do đó, thông số nhiệt độ nên luôn được đặt bằng 0.
+
+### Document the various prompt attempts 
+
+
+Mẹo cuối cùng này đã được đề cập trước đó trong chương này, nhưng chúng tôi vẫn phải nhấn mạnh tầm quan trọng của nó: hãy ghi chép lại chi tiết toàn bộ các câu lệnh (prompt) mà bạn đã thử nghiệm để có thể đúc kết theo thời gian xem điều gì hiệu quả và điều gì không. 
+Kết quả đầu ra của câu lệnh có thể khác nhau tùy theo các mô hình, các cài đặt lấy mẫu (sampling settings) và thậm chí là giữa các phiên bản khác nhau của cùng một mô hình. 
+Hơn nữa, ngay cả khi sử dụng cùng một câu lệnh cho cùng một mô hình, những khác biệt nhỏ trong cách định dạng câu và lựa chọn từ ngữ vẫn có thể xảy ra. (Ví dụ, như đã đề cập trước đó, nếu hai token có cùng xác suất dự đoán, các trường hợp ngang bằng có thể được giải quyết một cách ngẫu nhiên. Điều này sau đó có thể ảnh hưởng đến các token được dự đoán tiếp theo).
+
+Chúng tôi khuyên bạn nên tạo một Google Sheet với Bảng 21 làm mẫu (template). Ưu điểm của cách làm này là bạn sẽ có một bản ghi chép đầy đủ khi chắc chắn phải xem lại công việc tạo prompt (câu lệnh) của mình – dù là để tiếp tục công việc sau này (bạn sẽ ngạc nhiên khi thấy mình có thể quên nhiều thế nào chỉ sau một thời gian nghỉ ngắn), để kiểm tra hiệu suất của prompt trên các phiên bản mô hình khác nhau, hay để hỗ trợ sửa lỗi trong tương lai.
+
+Ngoài các trường thông tin trong bảng này, bạn cũng nên theo dõi phiên bản của prompt (lần lặp), một trường để ghi chú kết quả là ĐẠT/KHÔNG ĐẠT/ĐẠT MỘT PHẦN, và một trường để ghi lại phản hồi. Nếu bạn đang sử dụng Vertex AI Studio, hãy lưu các prompt của mình (sử dụng cùng tên và phiên bản như đã liệt kê trong tài liệu của bạn) và dán siêu liên kết (hyperlink) của prompt đã lưu vào trong bảng. Bằng cách này, bạn luôn chỉ cần một cú nhấp chuột là có thể chạy lại các prompt của mình.
+
+Khi làm việc với hệ thống tạo nội dung có tăng cường truy xuất (RAG), bạn cũng nên theo dõi các khía cạnh cụ thể của hệ thống RAG có ảnh hưởng đến nội dung được chèn vào prompt, bao gồm truy vấn (query), các thiết lập phân đoạn (chunk settings), kết quả phân đoạn (chunk output) và các thông tin khác.
+
+Khi bạn cảm thấy prompt đã gần đạt mức hoàn hảo, hãy đưa nó vào codebase (cơ sở mã nguồn) của dự án. Trong codebase, hãy lưu các prompt trong một tệp riêng biệt với mã nguồn để dễ dàng bảo trì hơn. Cuối cùng, lý tưởng nhất là các prompt của bạn nên là một phần của hệ thống vận hành, và với tư cách là một kỹ sư prompt, bạn nên dựa vào các thử nghiệm tự động và quy trình đánh giá để hiểu rõ mức độ hiệu quả của prompt đối với một tác vụ cụ thể.
+
+Kỹ thuật tạo prompt (Prompt engineering) là một quá trình lặp đi lặp lại. Hãy xây dựng và kiểm tra các prompt khác nhau, phân tích và ghi chép lại kết quả. Tinh chỉnh prompt của bạn dựa trên hiệu suất của mô hình. Hãy tiếp tục thử nghiệm cho đến khi bạn đạt được kết quả mong muốn. Khi bạn thay đổi mô hình hoặc cấu hình mô hình, hãy quay lại và tiếp tục thử nghiệm với các prompt đã sử dụng trước đó.
