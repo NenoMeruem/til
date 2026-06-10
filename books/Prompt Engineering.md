@@ -432,8 +432,6 @@ Hãy xem Bảng 4, nơi tôi trả về kết quả dưới định dạng JSON.
 </table>
 
 
-
-
 Có một số lợi ích khi trả về các đối tượng **JSON** từ một prompt dùng để trích xuất dữ liệu. Trong các ứng dụng thực tế (real-world application), tôi không cần phải tự tay xây dựng định dạng JSON này, vì tôi đã có thể trả về dữ liệu theo thứ tự đã được sắp xếp (điều này đặc biệt hữu ích khi làm việc với các đối tượng **datetime**).
 
 Quan trọng hơn, việc yêu cầu đầu ra ở định dạng JSON giúp “ép” mô hình phải tạo ra một cấu trúc rõ ràng, từ đó giảm thiểu hiện tượng **hallucination** (mô hình tự bịa hoặc suy diễn sai dữ liệu).
@@ -692,7 +690,7 @@ Vì vậy, hãy thử kiểm tra xem việc bổ sung các **bước suy luận
 <table>
   <tr>
 	  <th>Prompt</th>
-      <td colspan="3">When I was 3 years old, my partner was 3 times my age. Now,  I am 20 years old. How old is my partner? Let's think step  by step.  </td>
+      <td colspan="3">When I was 3 years old, my partner was 3 times my age. Now,  I am 20 years old. How old is my partner? Let's think step  by step. </td>
   </tr>
   <tr>
     <th>Output</th>
