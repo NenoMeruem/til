@@ -1,0 +1,12 @@
+
+- ai
+- habits
+- productivity
+- software-engineering
+- career
+- communication
+- code-review
+- debugging
+- learning
+- teamwork
+- mindset
