@@ -1,7 +1,7 @@
 # 8 Habits That Can Make You an Unstoppable Software Engineer
 
 Node: [[article]]
-Tags: #productivity, #habits
+Tags: #productivity
 
 
 ## Kỹ sư phần mềm giỏi không phải do bẩm sinh – mà là kết quả của thói quen được rèn luyện.
