@@ -1334,7 +1334,6 @@ Nhìn chung, khi sử dụng suy luận để đưa ra đáp án cuối cùng, t
 
 ### Document the various prompt attempts 
 
-
 Mẹo cuối cùng này đã được đề cập trước đó trong chương này, nhưng chúng tôi vẫn phải nhấn mạnh tầm quan trọng của nó: hãy ghi chép lại chi tiết toàn bộ các câu lệnh (prompt) mà bạn đã thử nghiệm để có thể đúc kết theo thời gian xem điều gì hiệu quả và điều gì không. 
 Kết quả đầu ra của câu lệnh có thể khác nhau tùy theo các mô hình, các cài đặt lấy mẫu (sampling settings) và thậm chí là giữa các phiên bản khác nhau của cùng một mô hình. 
 Hơn nữa, ngay cả khi sử dụng cùng một câu lệnh cho cùng một mô hình, những khác biệt nhỏ trong cách định dạng câu và lựa chọn từ ngữ vẫn có thể xảy ra. (Ví dụ, như đã đề cập trước đó, nếu hai token có cùng xác suất dự đoán, các trường hợp ngang bằng có thể được giải quyết một cách ngẫu nhiên. Điều này sau đó có thể ảnh hưởng đến các token được dự đoán tiếp theo).
