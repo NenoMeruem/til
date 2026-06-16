@@ -1,0 +1,65 @@
+name: Google Drive Sync
+
+on:
+  workflow_dispatch:
+    inputs:
+      docs_dir:
+        description: 'Thư mục chứa tài liệu markdown (relative to root)'
+        required: true
+        default: 'courses/Claude Code in Action'
+      images_dir:
+        description: 'Thư mục chứa hình ảnh cần di chuyển & xóa (relative to root)'
+        required: true
+        default: 'courses/Claude Code in Action/images'
+      dry_run:
+        description: 'Chạy thử nghiệm không thực sự ghi đè/xóa (true/false)'
+        required: true
+        default: 'false'
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install google-api-python-client google-auth-httplib2 google-auth-oauthlib python-dotenv
+
+      - name: Run Sync Script
+        env:
+          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
+          GDRIVE_SERVICE_ACCOUNT_KEY: ${{ secrets.GDRIVE_SERVICE_ACCOUNT_KEY }}
+          DOCS_DIR: ${{ github.event.inputs.docs_dir }}
+          IMAGES_DIR: ${{ github.event.inputs.images_dir }}
+        run: |
+          DRY_RUN_ARG=""
+          if [ "${{ github.event.inputs.dry_run }}" = "true" ]; then
+            DRY_RUN_ARG="--dry-run"
+          fi
+          python tools/gdrive_sync.py $DRY_RUN_ARG
+
+      - name: Commit and Push Changes
+        if: ${{ github.event.inputs.dry_run != 'true' }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add -A
+          # Check if there are changes to commit (e.g. updated links, deleted files)
+          if git diff --cached --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "chore: auto-sync docs and release local images to GDrive [skip ci]"
+            git push
+          fi
