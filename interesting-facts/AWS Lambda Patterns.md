@@ -63,7 +63,6 @@ Thay vì viết các **monolithic service** (dịch vụ nguyên khối) cồng 
 *   Chuyển các tác vụ nặng (heavy tasks) ra khỏi luồng xử lý request đồng bộ (synchronous request path) để tăng tốc độ phản hồi.
 *   Đảm bảo dữ liệu được xử lý ít nhất một lần (**at-least-once delivery**) với sự hỗ trợ của cơ chế thử lại và **Dead-letter queue (DLQ)** (hàng đợi cho các tin nhắn lỗi).
 
-
 ### 3. Strangler Pattern (Mô hình "Bóp nghẹt")
 
 Khi hiện đại hóa các hệ thống **Legacy** (hệ thống cũ), **Strangler Pattern** giúp bạn chuyển đổi dần dần từng phần thay vì phải **rewrite** (viết lại) toàn bộ hệ thống từ đầu.
@@ -136,3 +135,6 @@ Trong mô hình đồng bộ, Client gửi đi một request và bắt buộc ph
 AWS Lambda là một công cụ cực kỳ mạnh mẽ, được ứng dụng rộng rãi trên toàn cầu với vô số các use case (trường hợp sử dụng) và architecture pattern (mô hình kiến trúc) đa dạng. Chúng tôi đã cố gắng tổng hợp một vài mô hình tiêu biểu; hy vọng rằng mỗi khi cân nhắc tích hợp Lambda function vào kiến trúc hệ thống, bạn sẽ có sẵn một "bản danh sách" các pattern để linh hoạt lựa chọn.
 
 Tuy nhiên, hãy coi đây là những tài liệu tham khảo mang tính định hướng: các pattern này hoàn toàn có thể được kết hợp, tùy biến hoặc tái cấu trúc tùy theo nhu cầu thực tế. Điều quan trọng nhất vẫn là bạn cần nắm vững bản chất: dùng ở đâu và dùng như thế nào để tối ưu hóa triệt để sức mạnh của kiến trúc Serverless mà AWS Lambda mang lại.
+
+
+ref: https://joudwawad.medium.com/aws-lambda-patterns-da5007b72a00
