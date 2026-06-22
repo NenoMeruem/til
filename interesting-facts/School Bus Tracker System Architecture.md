@@ -513,3 +513,6 @@ Trong bài viết chuyên sâu này, chúng ta đã đi sâu vào nhiều khía 
 Hơn nữa, chúng ta cũng đã thảo luận kỹ lưỡng về các chiến lược mở rộng, nhấn mạnh tầm quan trọng của việc có thể scale từng thành phần một cách độc lập. Bằng cách tận dụng các dịch vụ được quản lý (managed services) và áp dụng các best practices, hệ thống của chúng ta được thiết kế để có khả năng mở rộng và độ sẵn sàng (high availability) cao, đáp ứng linh hoạt các biến động về nhu cầu và đảm bảo hiệu năng ổn định.
 
 Tôi khuyến khích các bạn dành thời gian nghiên cứu kỹ bài viết này. Nếu có bất kỳ câu hỏi hoặc góp ý nào để cải thiện, hãy chia sẻ dưới phần bình luận. Mọi phản hồi của các bạn đều vô cùng quý giá để giúp tôi nâng cao chất lượng nội dung và mang lại nhiều giá trị hơn cho cộng đồng.
+
+
+ref: https://joudwawad.medium.com/school-bus-tracker-system-architecture-6dd3307e3860
