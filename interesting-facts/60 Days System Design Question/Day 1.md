@@ -1,4 +1,5 @@
-
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
 
 **Ứng dụng di động của chúng ta hiện đang kết nối trực tiếp với 3 backend service. Một service thứ 4 sẽ được triển khai vào sprint tới, và team mobile hiện đang "ngập đầu" trong khối lượng công việc.**
 

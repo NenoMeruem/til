@@ -1,4 +1,5 @@
-
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
 
 ### Khi "N+1" trở thành bài toán cân não
 

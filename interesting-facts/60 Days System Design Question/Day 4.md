@@ -1,5 +1,8 @@
-
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
 ### Tránh Double-Charge (Trừ tiền trùng lặp) khi Client gửi Request nhiều lần
+
+![[Pasted image 20260623150219.png]]
 
 Người dùng nhấn nút "Pay $499" tại màn hình thanh toán.
 Biểu tượng loading (spinner) cứ xoay mãi. Họ nhấn thêm lần nữa, rồi thêm lần nữa.

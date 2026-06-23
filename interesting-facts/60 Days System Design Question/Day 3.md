@@ -1,4 +1,5 @@
-
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
 
 ### Bài toán Rate Limiting: Tại sao hệ thống của bạn đang "thở oxy"?
 
