@@ -1,3 +1,6 @@
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
+
 ### Your events table on PostgreSQL 15 just crossed 200M rows.
 
 Khi bảng `events` trên PostgreSQL 15 của bạn chạm mốc 200 triệu dòng...
@@ -60,4 +63,8 @@ Một index dạng `(tenant_id, event_type, created_at)` sẽ giúp dashboard c�
 Các index này vẫn phải tồn tại ở đâu đó. Nếu bạn đẩy chúng sang **Read Replica**, nó sẽ bị "hụt hơi" khi phải liên tục **replay WAL** (Write Ahead Log) để duy trì cấu trúc index. Nếu để trên **Primary**, bạn lại quay về bài toán "nút thắt cổ chai" ban đầu.
 
 Cần lưu ý: Read Replica chỉ giải quyết bài toán "Primary không đủ tài nguyên để phục vụ toàn bộ các truy vấn đọc". Chúng không giải quyết được bài toán "hiệu năng đường dẫn ghi (write path) bị nghẽn do quá trình bảo trì index".
+
+
+
+
 

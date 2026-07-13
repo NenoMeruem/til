@@ -1,4 +1,5 @@
-
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
 ### You’re running 3 workloads against the same Postgres RDS instance. max_connections = 300
 
 ![[Pasted image 20260626110337.png]]

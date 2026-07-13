@@ -1,5 +1,8 @@
 
-# Your Kafka consumer is processing 800 events/sec.
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
+
+### Your Kafka consumer is processing 800 events/sec.
 
 ![[Pasted image 20260708165407.png]]
 

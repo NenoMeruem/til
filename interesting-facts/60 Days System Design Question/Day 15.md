@@ -1,3 +1,8 @@
+
+
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
+
 ### You’re running a content recommendation feed. 50M users.
 
 ![[Pasted image 20260626113331.png]]

@@ -1,4 +1,5 @@
-
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
 
 ### You’re shipping a rewrite of your checkout write path on Friday.
 
