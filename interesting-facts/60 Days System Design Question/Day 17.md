@@ -8,8 +8,6 @@ Tags: #system-design
 
 
 
-
-
 Consumer Kafka của bạn đang xử lý 800 events/giây.
 
 Nhưng Producer vừa đẩy tốc độ lên 5.000 events/giây và chưa có dấu hiệu dừng lại.
