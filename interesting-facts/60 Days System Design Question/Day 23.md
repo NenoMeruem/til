@@ -1,3 +1,7 @@
+
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
+
 #### Your feed service was reading at 20ms.
 
 ![[Pasted image 20260807142454.png]]

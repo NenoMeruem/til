@@ -1,4 +1,7 @@
 
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
+
 #### Your payment service just charged a customer.
 
 ![[Pasted image 20260807141752.png]]
