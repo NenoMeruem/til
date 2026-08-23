@@ -1,3 +1,7 @@
+
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
+
 ### You’re building a semantic search feature for a B2B SaaS product.
 
 ![[Pasted image 20260819102250.png]]

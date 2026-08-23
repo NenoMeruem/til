@@ -1,3 +1,5 @@
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design 
 
 ### Your LLM answers are wrong. Not hallucination-wrong — outdated-wrong.
 
