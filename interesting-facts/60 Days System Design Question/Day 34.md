@@ -1,4 +1,5 @@
-
+Nodes: [[60 Days System Design Question]]
+Tags: #system-design
 ### Your AI feature works in the demo.
 
 ![[Pasted image 20260827163504.png]]
